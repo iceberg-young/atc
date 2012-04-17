@@ -15,7 +15,7 @@ namespace atc\ast {
 			return $this->entry;
 		}
 
-		public function setEntry( block $block ) {
+		public function setEntry( body\call $block ) {
 			$this->entry = $block;
 		}
 

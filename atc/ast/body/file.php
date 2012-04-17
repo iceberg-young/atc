@@ -1,7 +1,7 @@
 <?php
-namespace atc\ast {
+namespace atc\ast\body {
 
-	class file extends \atc\ast {
+	class file extends \atc\ast\body {
 
 		/**
 		 * Required by parent.

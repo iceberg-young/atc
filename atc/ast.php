@@ -6,6 +6,7 @@ namespace atc {
 		public function __construct( builder $builder, $parent = null ) {
 			$this->builder = $builder;
 			$this->parent = $parent;
+			$this->advance();
 		}
 
 		public function __toString() {
@@ -22,11 +23,11 @@ namespace atc {
 
 		public function push( $c ) {
 			if ( !$this->node ) {
-				$ast = $this->select( $c );
-				if ( $ast ) {
-					$class = '\\atc\\ast\\' . (true === $ast ? static::$fallback : $ast);
+				$type = $this->findNode( $c );
+				if ( $type ) {
+					$class = '\\atc\\ast\\' . (true !== $type ? $type : static::$fallback);
 					$this->node = new $class( $this->builder, $this );
-					if ( true === $ast ) {
+					if ( true === $type ) {
 						foreach ( str_split( $this->segment ) as $p ) {
 							$this->pushNode( $p );
 						}
@@ -39,26 +40,15 @@ namespace atc {
 			else $this->pushNode( $c );
 		}
 
-		protected function select( $c ) {
+		private function findNode( $c ) {
 			if ( $this->intact ) {
 				$this->intact = !preg_match( '/\S/', $c );
 			}
 			if ( !$this->intact ) {
 				++$this->length;
 				$this->segment .= $c;
-				foreach ( static::$prefixes as $prefix => $length ) {
-					if ( $this->length <= $length ) {
-						if ( substr( $prefix, 0, $this->length ) === $this->segment ) {
-							$match = true;
-							break;
-						}
-					}
-					elseif ( preg_match( "/$prefix\W/", $this->segment ) ) {
-						return "prefix\\_$prefix";
-					}
-				}
+				return $this->select();
 			}
-			return !($this->intact || isset( $match ));
 		}
 
 		private function pushNode( $c ) {
@@ -66,8 +56,13 @@ namespace atc {
 				$this->children[] = $this->node;
 				$this->intact = true;
 				$this->node = null;
+				$this->advance();
 			}
 		}
+
+		abstract protected function select();
+
+		abstract protected function advance();
 
 		/**
 		 * Current builder.
@@ -103,8 +98,8 @@ namespace atc {
 		 * Pushed part during selecting.
 		 * @var string
 		 */
-		private $segment = '';
-		private $length = 0;
+		protected $segment = '';
+		protected $length = 0;
 
 	}
 

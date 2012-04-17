@@ -13,11 +13,11 @@ namespace atc {
 			$this->column = 0;
 
 			if ( $isEntry ) {
-				$node = new ast\block( $this );
+				$node = new ast\body\call( $this );
 				$this->tree->setEntry( $node );
 			}
 			else {
-				$node = new ast\file( $this );
+				$node = new ast\body\file( $this );
 			}
 
 			$file = fopen( $path, 'r' );
