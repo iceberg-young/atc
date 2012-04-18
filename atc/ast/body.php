@@ -3,30 +3,32 @@ namespace atc\ast {
 
 	class body extends \atc\ast {
 
-		protected function select() {
+		public function __toString() {
+			return implode( "\n", $this->children );
+		}
+
+		protected function advanceFilter() {
+			if ( $this->current ) {
+				$this->children[] = $this->current;
+			}
+			$this->options = static::$prefixes;
+		}
+
+		protected function filterDeriver() {
+			$fragsize = strlen( $this->fragment );
 			foreach ( $this->options as $option => $length ) {
-				if ( $this->length <= $length ) {
-					if ( substr( $option, 0, $this->length ) === $this->segment ) {
+				if ( $fragsize <= $length ) {
+					if ( substr( $option, 0, $fragsize ) === $this->fragment ) {
 						return;
 					}
 				}
-				elseif ( preg_match( "/$option\W/", $this->segment ) ) {
+				elseif ( preg_match( "/$option\W/", $this->fragment ) ) {
 					return "head\\_$option";
 				}
 				unset( $this->options[$option] );
 			}
-			return true;
+			return static::$fallback;
 		}
-
-		protected function advance() {
-			$this->options = static::$prefixes;
-		}
-
-		/**
-		 * Possible key words.
-		 * @var array
-		 */
-		private $options;
 
 		/**
 		 * Possible prefixes with lengths.
@@ -39,6 +41,18 @@ namespace atc\ast {
 		 * @var string
 		 */
 		protected static $fallback = 'error';
+
+		/**
+		 * Inferior nodes.
+		 * @var array
+		 */
+		private $children = array( );
+
+		/**
+		 * Possible key words.
+		 * @var array
+		 */
+		private $options;
 
 	}
 

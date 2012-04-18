@@ -3,14 +3,15 @@ namespace atc {
 
 	abstract class ast {
 
+		const UNDISTINGUISHABLE = false;
+
 		public function __construct( builder $builder, $parent = null ) {
 			$this->builder = $builder;
 			$this->parent = $parent;
-			$this->advance();
 		}
 
-		public function __toString() {
-			return implode( "\n", $this->children );
+		public function getBuilder() {
+			return $this->builder;
 		}
 
 		public function getParent() {
@@ -22,84 +23,75 @@ namespace atc {
 		}
 
 		public function push( $c ) {
-			if ( !$this->node ) {
-				$type = $this->findNode( $c );
-				if ( $type ) {
-					$class = '\\atc\\ast\\' . (true !== $type ? $type : static::$fallback);
-					$this->node = new $class( $this->builder, $this );
-					if ( true === $type ) {
-						foreach ( str_split( $this->segment ) as $p ) {
-							$this->pushNode( $p );
+			if ( !$this->current ) {
+				if ( $this->intact && preg_match( '/\S/', $c ) ) {
+					$this->advanceFilter();
+					$this->intact = false;
+					$this->fragment = '';
+				}
+				if ( !$this->intact ) {
+					$this->fragment .= $c;
+					$type = $this->filterDeriver();
+					if ( $type ) {
+						$class = "\\atc\\ast\\$type";
+						$this->current = new $class( $this->builder, $this );
+						if ( $class::UNDISTINGUISHABLE ) {
+							foreach ( str_split( $this->fragment ) as $p ) {
+								$this->pushNode( $p );
+							}
 						}
+						else $this->pushNode( $c );
 					}
-					else $this->pushNode( $c );
-					$this->segment = '';
-					$this->length = 0;
 				}
 			}
 			else $this->pushNode( $c );
 		}
 
-		private function findNode( $c ) {
-			if ( $this->intact ) {
-				$this->intact = !preg_match( '/\S/', $c );
-			}
-			if ( !$this->intact ) {
-				++$this->length;
-				$this->segment .= $c;
-				return $this->select();
-			}
+		protected function advanceFilter() {
+			trigger_error( __METHOD__ . ' must be overrided!', E_USER_ERROR );
+		}
+
+		protected function filterDeriver() {
+			trigger_error( __METHOD__ . ' must be overrided!', E_USER_ERROR );
 		}
 
 		private function pushNode( $c ) {
-			if ( $this->node->push( $c ) ) {
-				$this->children[] = $this->node;
+			if ( $this->current->push( $c ) ) {
+				$this->advanceFilter();
+				$this->current = null;
 				$this->intact = true;
-				$this->node = null;
-				$this->advance();
 			}
 		}
 
-		abstract protected function select();
+		/**
+		 * Pushed part during deriver filtering.
+		 * @var string
+		 */
+		protected $fragment = '';
 
-		abstract protected function advance();
+		/**
+		 * Current node.
+		 * @var \atc\ast
+		 */
+		protected $current;
 
 		/**
 		 * Current builder.
 		 * @var \atc\misc\builder
 		 */
-		protected $builder;
+		private $builder;
 
 		/**
 		 * Superior node.
 		 * @var \atc\ast
 		 */
-		protected $parent;
-
-		/**
-		 * Inferior nodes.
-		 * @var array
-		 */
-		protected $children = array( );
+		private $parent;
 
 		/**
 		 * Is constructing node.
 		 * @var boolean
 		 */
-		protected $intact = true;
-
-		/**
-		 * Current statement.
-		 * @var \atc\ast
-		 */
-		private $node;
-
-		/**
-		 * Pushed part during selecting.
-		 * @var string
-		 */
-		protected $segment = '';
-		protected $length = 0;
+		private $intact = true;
 
 	}
 
