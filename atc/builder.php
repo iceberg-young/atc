@@ -11,6 +11,9 @@ namespace atc {
 			$this->file = $path;
 			$this->line = 0;
 			$this->column = 0;
+			$this->stack = array( );
+			$this->string = false;
+			$this->escaping = false;
 
 			if ( $isEntry ) {
 				$node = new ast\body\call( $this );
@@ -22,6 +25,7 @@ namespace atc {
 
 			$file = fopen( $path, 'r' );
 			while ( false !== ($c = fgetc( $file )) ) {
+				$this->parseLevel( $c );
 				if ( "\n" === $c ) {
 					++$this->line;
 					$this->column = 0;
@@ -47,6 +51,36 @@ namespace atc {
 			return $this->column;
 		}
 
+		public function getLevel() {
+			return count( $this->stack ) + (null !== $this->top);
+		}
+
+		private function parseLevel( $c ) {
+			if ( !$this->string ) {
+				if ( isset( self::$brackets[$c] ) ) {
+					if ( $this->top ) {
+						array_push( $this->stack, $this->top );
+					}
+					$this->top = $c;
+					$this->string = self::$brackets[$this->top] === $c;
+				}
+				elseif ( in_array( $c, self::$brackets ) ) {
+					if ( $this->top && (self::$brackets[$this->top] === $c) ) {
+						$this->top = array_pop( $this->stack );
+					}
+					else trigger_error( 'unbalanced', E_USER_WARNING );
+				}
+			}
+			elseif ( !$this->escaping ) {
+				if ( '\\' === $c ) $this->escaping = true;
+				elseif ( $this->top === $c ) {
+					$this->top = array_pop( $this->stack );
+					$this->string = false;
+				}
+			}
+			else $this->escaping = false;
+		}
+
 		/**
 		 * @var ast\tree
 		 */
@@ -69,6 +103,42 @@ namespace atc {
 		 * @var number
 		 */
 		private $column;
+
+		/**
+		 * Nearest open bracket.
+		 * @var string
+		 */
+		private $top;
+
+		/**
+		 * Bracket stack.
+		 * @var array
+		 */
+		private $stack;
+
+		/**
+		 * Is parsing string.
+		 * @var boolean
+		 */
+		private $string;
+
+		/**
+		 * Is escaping in string.
+		 * @var boolean
+		 */
+		private $escaping;
+
+		/**
+		 * Bracket pairs.
+		 * @var array
+		 */
+		private static $brackets = array(
+			'(' => ')',
+			'[' => ']',
+			'{' => '}',
+			'"' => '"',
+			'\'' => '\'',
+		);
 
 	}
 
