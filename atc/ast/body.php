@@ -3,6 +3,8 @@ namespace atc\ast {
 
 	class body extends \atc\ast {
 
+		const FALLBACK = 'error'; ///< For mismatched case.
+
 		public function __toString() {
 			return implode( "\n", $this->children );
 		}
@@ -11,7 +13,7 @@ namespace atc\ast {
 			if ( null === $this->options ) {
 				$this->options = static::$prefixes;
 			}
-			$type = static::$fallback;
+			$type = static::FALLBACK;
 			$fragsize = strlen( $fragment );
 			foreach ( $this->options as $option => $length ) {
 				if ( $fragsize <= $length ) {
@@ -34,12 +36,6 @@ namespace atc\ast {
 		 * @var array
 		 */
 		protected static $prefixes = array( );
-
-		/**
-		 * For mismatched case.
-		 * @var string
-		 */
-		protected static $fallback = 'error';
 
 		/**
 		 * Inferior nodes.

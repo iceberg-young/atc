@@ -4,7 +4,7 @@ namespace atc\ast\body {
 	class file extends \atc\ast\body {
 
 		/**
-		 * Required by parent.
+		 * Override parent's.
 		 * @var array
 		 */
 		protected static $prefixes = array(
@@ -13,12 +13,6 @@ namespace atc\ast\body {
 			'scope' => 5,
 			'require' => 7,
 		);
-
-		/**
-		 * Required by parent.
-		 * @var string
-		 */
-		protected static $fallback = 'error';
 
 	}
 
