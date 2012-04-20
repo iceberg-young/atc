@@ -7,27 +7,26 @@ namespace atc\ast {
 			return implode( "\n", $this->children );
 		}
 
-		protected function advanceFilter() {
-			if ( $this->current ) {
-				$this->children[] = $this->current;
+		protected function filterDeriver( $fragment ) {
+			if ( null === $this->options ) {
+				$this->options = static::$prefixes;
 			}
-			$this->options = static::$prefixes;
-		}
-
-		protected function filterDeriver() {
-			$fragsize = strlen( $this->fragment );
+			$type = static::$fallback;
+			$fragsize = strlen( $fragment );
 			foreach ( $this->options as $option => $length ) {
 				if ( $fragsize <= $length ) {
-					if ( substr( $option, 0, $fragsize ) === $this->fragment ) {
+					if ( substr( $option, 0, $fragsize ) === $fragment ) {
 						return;
 					}
 				}
-				elseif ( preg_match( "/$option\W/", $this->fragment ) ) {
-					return "head\\_$option";
+				elseif ( preg_match( "/$option\W/", $fragment ) ) {
+					$type = "head\\_$option";
+					break;
 				}
 				unset( $this->options[$option] );
 			}
-			return static::$fallback;
+			$this->children[] = $this->createDeriver( $type );
+			$this->options = null;
 		}
 
 		/**

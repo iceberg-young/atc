@@ -8,9 +8,13 @@ namespace atc {
 		}
 
 		public function parse( $path, $isEntry = true ) {
-			$this->file = $path;
-			$this->line = 0;
-			$this->column = 0;
+			// Source location.
+			$this->path = $path;
+			$this->row = 0;
+			$this->column = -1;
+			$this->sources = array( );
+
+			// Bracket level.
 			$this->stack = array( );
 			$this->string = false;
 			$this->escaping = false;
@@ -27,9 +31,10 @@ namespace atc {
 			while ( false !== ($c = fgetc( $file )) ) {
 				$this->parseLevel( $c );
 				if ( "\n" === $c ) {
-					++$this->line;
-					$this->column = 0;
+					++$this->row;
+					$this->column = -1;
 				}
+				else ++$this->column;
 				$node->push( $c );
 			}
 			fclose( $file );
@@ -39,20 +44,25 @@ namespace atc {
 			return $this->tree;
 		}
 
-		public function getFile() {
-			return $this->file;
-		}
-
-		public function getLine() {
-			return $this->line;
-		}
-
-		public function getColumn() {
-			return $this->column;
-		}
-
 		public function getLevel() {
 			return count( $this->stack ) + (null !== $this->top);
+		}
+
+		public function getSource() {
+			return (object) array(
+				'path' => $this->path,
+				'row' => $this->row,
+				'column' => $this->column,
+				'level' => $this->getLevel(),
+			);
+		}
+
+		public function pushSource() {
+			array_push( $this->sources, $this->getSource() );
+		}
+
+		public function popSource() {
+			return array_pop( $this->sources );
 		}
 
 		private function parseLevel( $c ) {
@@ -87,22 +97,28 @@ namespace atc {
 		private $tree;
 
 		/**
-		 * Current file name.
+		 * Current file path.
 		 * @var string
 		 */
-		private $file;
+		private $path;
 
 		/**
-		 * Cyrrent line number.
+		 * Cyrrent row number.
 		 * @var number
 		 */
-		private $line;
+		private $row;
 
 		/**
 		 * Current column number
 		 * @var number
 		 */
 		private $column;
+
+		/**
+		 * Source location snapshots.
+		 * @var array
+		 */
+		private $sources;
 
 		/**
 		 * Nearest open bracket.
