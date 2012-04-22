@@ -14,7 +14,7 @@ namespace atc\ast\part {
 		}
 
 		public function push( $c ) {
-			if ( $this->getBuilder()->getLevel() >= $this->getSource()->level ) {
+			if ( $this->isInside() ) {
 				$this->body->push( $c );
 			}
 			else return true;

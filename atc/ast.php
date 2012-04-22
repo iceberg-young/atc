@@ -27,6 +27,10 @@ namespace atc {
 			return $this->intact;
 		}
 
+		public function isInside() {
+			return $this->builder->getLevel() >= $this->source->level;
+		}
+
 		public function push( $c ) {
 			if ( !$this->current ) {
 				if ( $this->intact && preg_match( '/\S/', $c ) ) {
