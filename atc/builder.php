@@ -82,7 +82,7 @@ namespace atc {
 				}
 			}
 			elseif ( !$this->escaping ) {
-				if ( '\\' === $c ) $this->escaping = true;
+				if ( '\\' === $c && '"' === $this->top ) $this->escaping = true;
 				elseif ( $this->top === $c ) {
 					$this->top = array_pop( $this->stack );
 					$this->string = false;
@@ -153,7 +153,7 @@ namespace atc {
 			'[' => ']',
 			'{' => '}',
 			'"' => '"',
-			'\'' => '\'',
+			"'" => "'",
 		);
 
 	}
