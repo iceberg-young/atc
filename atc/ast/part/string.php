@@ -18,6 +18,7 @@ namespace atc\ast\part {
 					if ( '\\' === $c ) {
 						if ( $this->escaping ) $this->content .= '\\';
 						$this->escaping = !$this->escaping;
+						return;
 					}
 					elseif ( $this->escaping ) {
 						if ( isset( self::$table[$c] ) ) {
@@ -28,9 +29,10 @@ namespace atc\ast\part {
 							$this->content .= "\\$c";
 						}
 						$this->escaping = false;
+						return;
 					}
 				}
-				else $this->content .= $c;
+				$this->content .= $c;
 			}
 			else return true;
 		}

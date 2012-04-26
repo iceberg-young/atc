@@ -40,21 +40,26 @@ namespace atc {
 				}
 				if ( !$this->intact ) {
 					$this->fragment .= $c;
-					$this->filterDeriver( $this->fragment );
+					if ( $this->filterDeriver( $this->fragment ) ) return true;
 				}
 			}
 			else $this->transfer( $c );
+			return $this->ending && $this->intact;
 		}
 
-		protected function createDeriver( $type ) {
-			$class = "\\atc\\ast\\$type";
-			$this->current = new $class( $this->builder, $this );
-			if ( $class::UNDISTINGUISHABLE ) {
-				foreach ( str_split( $this->fragment ) as $p ) {
-					$this->transfer( $p );
+		protected function createDeriver( $type, array $args = array( ), $transfer = true, $ending = false ) {
+			$this->ending = $ending;
+			array_push( $args, $this->builder, $this );
+			$class = new \ReflectionClass( "\\atc\\ast\\$type" );
+			$this->current = $class->newInstanceArgs( $args );
+			if ( $transfer ) {
+				if ( $class->getConstant( 'UNDISTINGUISHABLE' ) ) {
+					foreach ( str_split( $this->fragment ) as $p ) {
+						$this->transfer( $p );
+					}
 				}
+				else $this->transfer( substr( $this->fragment, -1 ) );
 			}
-			else $this->transfer( substr( $this->fragment, -1 ) );
 			return $this->current;
 		}
 
@@ -104,6 +109,12 @@ namespace atc {
 		 * @var boolean
 		 */
 		private $intact = true;
+
+		/**
+		 * Is the last node.
+		 * @var boolean
+		 */
+		private $ending = false;
 
 	}
 

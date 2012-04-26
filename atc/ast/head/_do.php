@@ -1,24 +1,23 @@
 <?php
 namespace atc\ast\head {
 
-	class _do extends \atc\ast {
+	class _do extends \atc\ast\head {
 
 		public function __toString() {
 			return "^^DO {$this->body}$$" . json_encode( $this->getSource() );
 		}
 
-		public function push( $c ) {
-			if ( null === $this->body && preg_match( '/\S/', $c ) ) {
-				if ( '{' !== $c ) trigger_error( '{ required', E_USER_ERROR );
-				$builder = $this->getBuilder();
-				$builder->pushSource();
-				$this->body = new \atc\ast\part\block( 'body\call', $builder, $this );
-				return false;
-			}
-			if ( $this->body ) return $this->body->push( $c );
+		protected function createBody() {
+			$this->body = $this->createDeriver( 'part\block', array( 'body\call' ), false, true );
 		}
 
 		private $body;
+		protected static $patterns = array(
+			array(
+				'trait' => array( '{' ),
+				'build' => 'createBody',
+			),
+		);
 
 	}
 
