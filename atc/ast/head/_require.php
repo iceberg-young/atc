@@ -14,11 +14,11 @@ namespace atc\ast\head {
 		private $path;
 		protected static $patterns = array(
 			array(
-				'trait' => array( '"', "'" ),
+				'trait' => '#["\']#',
 				'build' => 'createPath',
 			),
 			array(
-				'trait' => array( ';' ),
+				'trait' => '#;#',
 			),
 		);
 

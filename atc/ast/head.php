@@ -6,7 +6,7 @@ namespace atc\ast {
 		protected function filterDeriver( $fragment ) {
 			do {
 				$pattern = static::$patterns[$this->cursor++];
-				if ( in_array( $fragment, $pattern['trait'] ) ) {
+				if ( preg_match( $pattern['trait'], $fragment ) ) {
 					if ( isset( $pattern['build'] ) ) {
 						$method = $pattern['build'];
 						$this->$method( $fragment );
@@ -15,7 +15,7 @@ namespace atc\ast {
 					else return true;
 				}
 			} while ( isset( $pattern['optional'] ) );
-			trigger_error( 'unexpected', E_USER_ERROR );
+			trigger_error( "unexpected $fragment", E_USER_ERROR );
 		}
 
 		private $cursor = 0;

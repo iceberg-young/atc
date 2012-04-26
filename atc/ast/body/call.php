@@ -15,7 +15,7 @@ namespace atc\ast\body {
 			'alias' => 5,
 			'let' => 3,
 			'static' => 6,
-			'do' => 2,
+			'scope' => 5,
 			'for' => 3,
 			'if' => 2,
 			'switch' => 6,
