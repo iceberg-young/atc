@@ -7,16 +7,17 @@ namespace atc {
 
 		public function __construct( builder $builder, $parent = null ) {
 			$this->builder = $builder;
-			$this->source = $builder->popSource();
 			$this->parent = $parent;
+
+			$this->location = $this->builder->getLocation();
 		}
 
 		public function getBuilder() {
 			return $this->builder;
 		}
 
-		public function getSource() {
-			return $this->source;
+		public function getLocation() {
+			return $this->location;
 		}
 
 		public function getParent() {
@@ -28,13 +29,13 @@ namespace atc {
 		}
 
 		public function isInside() {
-			return $this->builder->getLevel() >= $this->source->level;
+			return $this->builder->getLevel() >= $this->location->level;
 		}
 
 		public function push( $c ) {
 			if ( !$this->current ) {
 				if ( $this->intact && preg_match( '/\S/', $c ) ) {
-					$this->builder->pushSource();
+					$this->builder->markLocation();
 					$this->intact = false;
 					$this->fragment = '';
 				}
@@ -63,7 +64,7 @@ namespace atc {
 			return $this->current;
 		}
 
-		protected function filterDeriver( $fragment ) {
+		protected function filterDeriver( array $fragment ) {
 			trigger_error( __METHOD__ . ' must be overrided!', E_USER_ERROR );
 		}
 
@@ -71,6 +72,7 @@ namespace atc {
 			if ( $this->current->push( $c ) ) {
 				$this->current = null;
 				$this->intact = true;
+				$this->builder->clearLocation();
 			}
 		}
 
@@ -78,7 +80,7 @@ namespace atc {
 		 * Pushed part during deriver filtering.
 		 * @var string
 		 */
-		private $fragment = '';
+		private $fragment;
 
 		/**
 		 * Current node.
@@ -93,10 +95,10 @@ namespace atc {
 		private $builder;
 
 		/**
-		 * Source location of the beginning.
+		 * Location of the source beginning.
 		 * @var object
 		 */
-		private $source;
+		private $location;
 
 		/**
 		 * Superior node.
@@ -105,13 +107,13 @@ namespace atc {
 		private $parent;
 
 		/**
-		 * Is constructing node.
+		 * Is constructing node?
 		 * @var boolean
 		 */
 		private $intact = true;
 
 		/**
-		 * Is the last node.
+		 * Is the last node?
 		 * @var boolean
 		 */
 		private $ending = false;

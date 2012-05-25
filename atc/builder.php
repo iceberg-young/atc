@@ -7,34 +7,38 @@ namespace atc {
 			$this->tree = new ast\tree();
 		}
 
-		public function parse( $path, $isEntry = true ) {
+		public function parse( $path ) {
+			switch ( strrchr( $path, '.' ) ) {
+				case '.ate':
+					$node = new ast\body\call( $this );
+					$this->tree->setEntry( $node );
+					break;
+				case '.atd':
+					$node = new ast\body\file( $this );
+					break;
+				default:
+					die( "I don't know how to deal with $path." );
+			}
+
+			$this->parser = 'parseBracket';
+
 			// Source location.
 			$this->path = $path;
 			$this->row = 0;
 			$this->column = -1;
-			$this->sources = array( );
 
 			// Bracket level.
 			$this->stack = array( );
-			$this->string = false;
 			$this->escaping = false;
-
-			if ( $isEntry ) {
-				$node = new ast\body\call( $this );
-				$this->tree->setEntry( $node );
-			}
-			else {
-				$node = new ast\body\file( $this );
-			}
 
 			$file = fopen( $path, 'r' );
 			while ( false !== ($c = fgetc( $file )) ) {
-				$this->parseLevel( $c );
 				if ( "\n" === $c ) {
 					++$this->row;
 					$this->column = -1;
 				}
 				else ++$this->column;
+				$this->{$this->parser}( $c );
 				$node->push( $c );
 			}
 			fclose( $file );
@@ -45,11 +49,15 @@ namespace atc {
 		}
 
 		public function getLevel() {
-			return count( $this->stack ) + (null !== $this->top);
+			return count( $this->stack );
 		}
 
-		public function getSource() {
-			return (object) array(
+		public function getLocation() {
+			return $this->location;
+		}
+
+		public function markLocation() {
+			$this->location = (object) array(
 				'path' => $this->path,
 				'row' => $this->row,
 				'column' => $this->column,
@@ -57,39 +65,54 @@ namespace atc {
 			);
 		}
 
-		public function pushSource() {
-			array_push( $this->sources, $this->getSource() );
+		public function clearLocation() {
+			$this->location = null;
 		}
 
-		public function popSource() {
-			return array_pop( $this->sources );
+		private function parseBracket( $c ) {
+			if ( isset( self::$brackets[$c] ) ) {
+				$this->stack[] = $c;
+				if ( isset( self::$literals[$c] ) ) {
+					$this->parser = self::$literals[$c];
+					if ( '`' === $c ) $this->delimiters = array( );
+				}
+			}
+			else $this->parseTerminal( $c );
 		}
 
-		private function parseLevel( $c ) {
-			if ( !$this->string ) {
-				if ( isset( self::$brackets[$c] ) ) {
-					if ( $this->top ) {
-						array_push( $this->stack, $this->top );
-					}
-					$this->top = $c;
-					$this->string = self::$brackets[$this->top] === $c;
-				}
-				elseif ( in_array( $c, self::$brackets ) ) {
-					if ( $this->top && (self::$brackets[$this->top] === $c) ) {
-						$this->top = array_pop( $this->stack );
-					}
-					else trigger_error( 'unbalanced', E_USER_WARNING );
-				}
+		private function parseRawString( $c ) {
+			if ( end( $this->delimiters ) !== '`' ) $this->delimiters[] = $c;
+			elseif ( '`' === $c ) {
+				reset( $this->delimiters );
+				$this->parser = 'parseRawEnding';
 			}
-			elseif ( !$this->escaping ) {
-				if ( '\\' === $c && '"' === $this->top ) $this->escaping = true;
-				elseif ( $this->top === $c ) {
-					$this->top = array_pop( $this->stack );
-					$this->string = false;
-				}
-			}
-			else $this->escaping = false;
 		}
+
+		private function parseRawEnding( $c ) {
+			$d = each( $this->delimiters );
+			$d[1] !== $c ? reset( $this->delimiters ) : $this->parseTerminal( $c );
+		}
+
+		private function parseEscapable( $c ) {
+			if ( $this->escaping ) $this->escaping = false;
+			elseif ( '\\' === $c ) $this->escaping = true;
+			else $this->parseTerminal( $c );
+		}
+
+		private function parseTerminal( $c ) {
+			$top = end( $this->stack );
+			if ( false === $top ) return;
+			if ( self::$brackets[$top] === $c ) {
+				array_pop( $this->stack );
+				$this->parser = 'parseBracket';
+			}
+		}
+
+		/**
+		 * Current parser function name.
+		 * @var string
+		 */
+		private $parser;
 
 		/**
 		 * @var ast\tree
@@ -115,16 +138,10 @@ namespace atc {
 		private $column;
 
 		/**
-		 * Source location snapshots.
-		 * @var array
+		 * Source location snapshot.
+		 * @var object
 		 */
-		private $sources;
-
-		/**
-		 * Nearest open bracket.
-		 * @var string
-		 */
-		private $top;
+		private $location;
 
 		/**
 		 * Bracket stack.
@@ -133,16 +150,16 @@ namespace atc {
 		private $stack;
 
 		/**
-		 * Is parsing string.
-		 * @var boolean
-		 */
-		private $string;
-
-		/**
-		 * Is escaping in string.
+		 * Is escaping a literal?
 		 * @var boolean
 		 */
 		private $escaping;
+
+		/**
+		 * Delimiters of raw string.
+		 * @var array
+		 */
+		private $delimiters;
 
 		/**
 		 * Bracket pairs.
@@ -152,8 +169,21 @@ namespace atc {
 			'(' => ')',
 			'[' => ']',
 			'{' => '}',
+			'`' => '`',
 			'"' => '"',
 			"'" => "'",
+			'#' => "\n",
+		);
+
+		/**
+		 * Literals parsers.
+		 * @var array
+		 */
+		private static $literals = array(
+			'`' => 'parseRawString',
+			'"' => 'parseEscapable',
+			"'" => 'parseEscapable',
+			'#' => "parseTerminal",
 		);
 
 	}
