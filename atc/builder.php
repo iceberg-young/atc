@@ -3,18 +3,13 @@ namespace atc {
 
 	class builder {
 
-		public function __construct() {
-			$this->tree = new ast\tree();
-		}
-
 		public function parse( $path ) {
 			switch ( strrchr( $path, '.' ) ) {
 				case '.ate':
-					$node = new ast\body\call( $this );
-					$this->tree->setEntry( $node );
+					$this->node = new ast\body\call( $this );
 					break;
 				case '.atd':
-					$node = new ast\body\file( $this );
+					$this->node = new ast\body\file( $this );
 					break;
 				default:
 					die( "I don't know how to deal with $path." );
@@ -39,13 +34,13 @@ namespace atc {
 				}
 				else ++$this->column;
 				$this->{$this->parser}( $c );
-				$node->push( $c );
+				$this->node->push( $c );
 			}
 			fclose( $file );
 		}
 
-		public function getAst() {
-			return $this->tree;
+		public function getNode() {
+			return $this->node;
 		}
 
 		public function getLevel() {
@@ -115,9 +110,9 @@ namespace atc {
 		private $parser;
 
 		/**
-		 * @var ast\tree
+		 * @var ast
 		 */
-		private $tree;
+		private $node;
 
 		/**
 		 * Current file path.
