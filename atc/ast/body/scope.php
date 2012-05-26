@@ -1,7 +1,7 @@
 <?php
 namespace atc\ast\body {
 
-	class file extends \atc\ast\body {
+	class scope extends \atc\ast\body {
 
 		/**
 		 * Override parent's.
@@ -11,6 +11,8 @@ namespace atc\ast\body {
 			'require' => 7,
 			'scope' => 5,
 			'alias' => 5,
+			'class' => 5,
+			'call' => 4,
 		);
 
 	}

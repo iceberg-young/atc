@@ -41,15 +41,18 @@ namespace atc {
 				}
 				if ( !$this->intact ) {
 					$this->fragment .= $c;
-					if ( $this->filterDeriver( $this->fragment ) ) return true;
+					$status = $this->filterDeriver( $this->fragment );
+					if ( $status ) {
+						$this->fragment = '';
+						$status = null;
+					}
+					return $status;
 				}
 			}
-			else $this->transfer( $c );
-			return $this->ending && $this->intact;
+			else return $this->transfer( $c );
 		}
 
-		protected function createDeriver( $type, array $args = array( ), $transfer = true, $ending = false ) {
-			$this->ending = $ending;
+		protected function createDeriver( $type, array $args = array( ), $transfer = true ) {
 			array_push( $args, $this->builder, $this );
 			$class = new \ReflectionClass( "\\atc\\ast\\$type" );
 			$this->current = $class->newInstanceArgs( $args );
@@ -69,10 +72,12 @@ namespace atc {
 		}
 
 		private function transfer( $c ) {
-			if ( $this->current->push( $c ) ) {
+			$status = $this->current->push( $c );
+			if ( null !== $status ) {
 				$this->current = null;
 				$this->intact = true;
 				$this->builder->clearLocation();
+				return $status ? true : $this->push( $c );
 			}
 		}
 
@@ -111,12 +116,6 @@ namespace atc {
 		 * @var boolean
 		 */
 		private $intact = true;
-
-		/**
-		 * Is the last node?
-		 * @var boolean
-		 */
-		private $ending = false;
 
 	}
 

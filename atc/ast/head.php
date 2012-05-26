@@ -5,12 +5,15 @@ namespace atc\ast {
 
 		protected function filterDeriver( $fragment ) {
 			do {
-				$pattern = static::$patterns[$this->cursor++];
+				$entry = each( static::$patterns );
+				if ( !$entry ) {
+					reset( static::$patterns );
+					return false;
+				}
+				$pattern = $entry['value'];
 				if ( preg_match( $pattern['trait'], $fragment ) ) {
 					if ( isset( $pattern['build'] ) ) {
-						$method = $pattern['build'];
-						$this->$method( $fragment );
-						return;
+						return $this->{$pattern['build']}( $fragment );
 					}
 					else return true;
 				}
@@ -18,7 +21,11 @@ namespace atc\ast {
 			trigger_error( "unexpected $fragment", E_USER_ERROR );
 		}
 
-		private $cursor = 0;
+		/**
+		 * Possible patterns.
+		 * @var array
+		 */
+		protected static $patterns = array( );
 
 	}
 

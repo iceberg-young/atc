@@ -5,61 +5,54 @@ namespace atc\ast\part {
 
 		public function __construct( $type, \atc\builder $builder, $parent = null ) {
 			parent::__construct( $builder, $parent );
-			$this->escapable = '"' === $type;
+			$this->type = $type;
+			$this->parser = 'parseContent';
 		}
 
 		public function __toString() {
-			return "**{$this->content}**" . json_encode( $this->getSource() );
+			return "**{$this->content}**" . json_encode( $this->getLocation() );
 		}
 
 		public function push( $c ) {
-			if ( $this->isInside() ) {
-				if ( $this->escapable ) {
-					if ( '\\' === $c ) {
-						if ( $this->escaping ) $this->content .= '\\';
-						$this->escaping = !$this->escaping;
-						return;
-					}
-					elseif ( $this->escaping ) {
-						if ( isset( self::$table[$c] ) ) {
-							$this->content .= self::$table[$c];
-						}
-						else {
-							trigger_error( "cannot escape '$c'", E_USER_NOTICE );
-							$this->content .= "\\$c";
-						}
-						$this->escaping = false;
-						return;
-					}
+			return $this->{$this->parser}( $c );
+		}
+
+		private function parseContent( $c ) {
+			if ( !$this->isInside() ) {
+				if ( '`' === $this->type ) {
+					$d = strpos( $this->content, '`' );
+					$this->content = substr( $this->content, $d, -$d );
 				}
-				$this->content .= $c;
+				else {
+					// escaping?
+				}
+				$this->parser = 'parseSuffix';
 			}
-			else return true;
+			else $this->content .= $c;
+		}
+
+		private function parseSuffix( $c ) {
+			if ( preg_match( '/[a-z]/i', $c ) ) $this->suffix .= $c;
+			else return false;
 		}
 
 		/**
-		 * Is parsing " string.
-		 * @var boolean
+		 * One of TYPE_*.
+		 * @var string
 		 */
-		private $escapable;
-
-		/**
-		 * Is escaping in string.
-		 * @var boolean
-		 */
-		private $escaping;
-
-		/**
-		 * Partial content during escaping.
-		 * @var boolean
-		 */
-		private $escaped;
+		private $type;
 
 		/**
 		 * Parsed content.
 		 * @var string
 		 */
 		private $content;
+
+		/**
+		 * Parsed suffix.
+		 * @var string
+		 */
+		private $suffix;
 
 		/**
 		 * Escape lookup table.

@@ -14,15 +14,13 @@ namespace atc\ast\part {
 		}
 
 		public function push( $c ) {
-			if ( $this->isInside() ) {
-				$this->body->push( $c );
-			}
+			if ( $this->isInside() ) $this->body->push( $c );
 			else return true;
 		}
 
 		/**
 		 * Block content.
-		 * @var \atc\ast\body
+		 * @var \atc\ast
 		 */
 		private $body;
 

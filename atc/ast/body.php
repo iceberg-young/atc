@@ -17,9 +17,7 @@ namespace atc\ast {
 			$fragsize = strlen( $fragment );
 			foreach ( $this->options as $option => $length ) {
 				if ( $fragsize <= $length ) {
-					if ( substr( $option, 0, $fragsize ) === $fragment ) {
-						return;
-					}
+					if ( substr( $option, 0, $fragsize ) === $fragment ) return;
 				}
 				elseif ( preg_match( "/$option\W/", $fragment ) ) {
 					$type = "head\\_$option";
@@ -32,7 +30,7 @@ namespace atc\ast {
 		}
 
 		/**
-		 * Possible prefixes with lengths.
+		 * Possible prefixes with their length.
 		 * @var array
 		 */
 		protected static $prefixes = array( );

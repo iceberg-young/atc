@@ -3,18 +3,15 @@ namespace atc\ast {
 
 	class statement extends \atc\ast {
 
-		public function __construct( \atc\builder $builder, $prefix = '' ) {
-			$this->builder = $builder;
-			$this->me = $prefix;
-		}
+		const UNDISTINGUISHABLE = true;
 
 		public function __toString() {
-			return "^" . $this->me . "$";
+			return "^{$this->me}$" . json_encode( $this->getLocation() );
 		}
 
 		public function push( $c ) {
-			$this->me .= $c;
-			return ';' === $c;
+			if (';' !== $c) $this->me .= $c;
+			else return true;
 		}
 
 		private $me;
