@@ -12,14 +12,16 @@ namespace atc\ast\body {
 		protected static $prefixes = array(
 			'include' => 7,
 			'require' => 7,
-			'scope' => 5,
 			'alias' => 5,
-			'let' => 3,
+			'use' => 3,
 			'if' => 2,
+			'else' => 4,
 			'switch' => 6,
-			'for' => 3,
-			'while' => 5,
 			'try' => 3,
+			'catch' => 5,
+			'throw' => 5,
+			'each' => 4,
+			'while' => 5,
 		);
 
 	}

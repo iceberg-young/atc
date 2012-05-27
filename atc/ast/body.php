@@ -3,7 +3,7 @@ namespace atc\ast {
 
 	class body extends \atc\ast {
 
-		const FALLBACK = 'error'; ///< For mismatched case.
+		const FALLBACK = 'part\dirty'; ///< For mismatched case.
 
 		public function __toString() {
 			return implode( "\n", $this->children );

@@ -10,11 +10,11 @@ namespace atc\ast\part {
 		}
 
 		public function __toString() {
-			return "{\n{$this->body}\n}";
+			return $this->body->__toString();
 		}
 
 		public function push( $c ) {
-			if ( $this->isInside() ) $this->body->push( $c );
+			if ( $this->isDeep() ) $this->body->push( $c );
 			else return true;
 		}
 

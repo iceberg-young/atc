@@ -5,12 +5,8 @@ namespace atc\ast {
 
 		protected function filterDeriver( $fragment ) {
 			do {
-				$entry = each( static::$patterns );
-				if ( !$entry ) {
-					reset( static::$patterns );
-					return false;
-				}
-				$pattern = $entry['value'];
+				if ( !isset( static::$patterns[$this->cursor] ) ) return false;
+				$pattern = static::$patterns[$this->cursor++];
 				if ( preg_match( $pattern['trait'], $fragment ) ) {
 					if ( isset( $pattern['build'] ) ) {
 						return $this->{$pattern['build']}( $fragment );
@@ -26,6 +22,12 @@ namespace atc\ast {
 		 * @var array
 		 */
 		protected static $patterns = array( );
+
+		/**
+		 * Index of current pattern.
+		 * @var number
+		 */
+		private $cursor = 0;
 
 	}
 

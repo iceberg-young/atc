@@ -5,16 +5,16 @@ namespace atc\ast\part {
 
 		public function __construct( $global, \atc\builder $builder, $parent = null ) {
 			parent::__construct( $builder, $parent );
-			$this->rule = $global ? '[\[\w\.\]]' : '/\w/';
+			$this->rule = $global ? '/[\[\w\.\]]/' : '/\w/';
 		}
 
 		public function __toString() {
-			return "|{$this->content}|" . json_encode( $this->getLocation() );
+			return $this->content . $this->getDebugLocation();
 		}
 
 		public function push( $c ) {
 			if ( preg_match( $this->rule, $c ) ) $this->content .= $c;
-			else return true;
+			else return false;
 		}
 
 		/**

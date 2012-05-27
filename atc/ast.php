@@ -28,8 +28,12 @@ namespace atc {
 			return $this->intact;
 		}
 
-		public function isInside() {
+		public function isDeep() {
 			return $this->builder->getLevel() >= $this->location->level;
+		}
+
+		public function isShallow() {
+			return $this->builder->getLevel() <= $this->location->level;
 		}
 
 		public function push( $c ) {
@@ -43,6 +47,7 @@ namespace atc {
 					$this->fragment .= $c;
 					$status = $this->filterDeriver( $this->fragment );
 					if ( $status ) {
+						$this->intact = true;
 						$this->fragment = '';
 						$status = null;
 					}
@@ -71,13 +76,17 @@ namespace atc {
 			trigger_error( __METHOD__ . ' must be overrided!', E_USER_ERROR );
 		}
 
+		protected function getDebugLocation() {
+			return "\t#" . json_encode( $this->getLocation() ) . "\n";
+		}
+
 		private function transfer( $c ) {
 			$status = $this->current->push( $c );
 			if ( null !== $status ) {
 				$this->current = null;
 				$this->intact = true;
 				$this->builder->clearLocation();
-				return $status ? true : $this->push( $c );
+				if ( !$status ) return $this->push( $c );
 			}
 		}
 

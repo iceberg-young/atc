@@ -6,12 +6,12 @@ namespace atc\ast {
 		const UNDISTINGUISHABLE = true;
 
 		public function __toString() {
-			return "^{$this->me}$" . json_encode( $this->getLocation() );
+			return "*[*{$this->me}*]*;" . $this->getDebugLocation();
 		}
 
 		public function push( $c ) {
-			if (';' !== $c) $this->me .= $c;
-			else return true;
+			if ( (';' === $c) && $this->isShallow() ) return true;
+			else $this->me .= $c;
 		}
 
 		private $me;

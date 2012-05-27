@@ -10,7 +10,7 @@ namespace atc\ast\part {
 		}
 
 		public function __toString() {
-			return "**{$this->content}**" . json_encode( $this->getLocation() );
+			return $this->content . $this->getDebugLocation();
 		}
 
 		public function push( $c ) {
@@ -18,9 +18,9 @@ namespace atc\ast\part {
 		}
 
 		private function parseContent( $c ) {
-			if ( !$this->isInside() ) {
+			if ( !$this->isDeep() ) {
 				if ( '`' === $this->type ) {
-					$d = strpos( $this->content, '`' );
+					$d = strpos( $this->content, '`' ) + 1;
 					$this->content = substr( $this->content, $d, -$d );
 				}
 				else {
