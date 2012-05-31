@@ -15,8 +15,6 @@ namespace atc {
 					die( "I don't know how to deal with $path." );
 			}
 
-			$this->parser = 'parseBracket';
-
 			// Source location.
 			$this->path = $path;
 			$this->row = 0;
@@ -26,6 +24,8 @@ namespace atc {
 			$this->stack = array( );
 			$this->escaping = false;
 
+			$this->setParser( self::PARSE_BRACKET );
+
 			$file = fopen( $path, 'r' );
 			while ( false !== ($c = fgetc( $file )) ) {
 				if ( "\n" === $c ) {
@@ -34,7 +34,7 @@ namespace atc {
 				}
 				else ++$this->column;
 				$this->{$this->parser}( $c );
-				$this->node->push( $c );
+				call_user_func( $this->pusher, $c );
 			}
 			fclose( $file );
 		}
@@ -64,29 +64,57 @@ namespace atc {
 			$this->location = null;
 		}
 
+		private function setParser( $parser ) {
+			switch ( $parser ) {
+				case self::PARSE_BRACKET:
+					$this->pusher = array( $this, 'trim' );
+					$this->space = false;
+					break;
+
+				case self::PARSE_ESCAPABLE:
+				case self::PARSE_RAW_STRING:
+				case self::PARSE_RAW_ENDING:
+				case self::PARSE_TERMINAL:
+					$this->pusher = array( $this->node, 'push' );
+					break;
+
+				default:
+					trigger_error( "Unexpected parser: $parser", E_USER_ERROR );
+			}
+			$this->parser = $parser;
+		}
+
+		const PARSE_BRACKET = 'parseBracket';
+
 		private function parseBracket( $c ) {
 			if ( isset( self::$brackets[$c] ) ) {
 				$this->stack[] = $c;
 				if ( isset( self::$literals[$c] ) ) {
-					$this->parser = self::$literals[$c];
+					$this->setParser( self::$literals[$c] );
 					if ( '`' === $c ) $this->delimiters = array( );
 				}
 			}
 			else $this->parseTerminal( $c );
 		}
 
+		const PARSE_RAW_STRING = 'parseRawString';
+
 		private function parseRawString( $c ) {
 			if ( end( $this->delimiters ) !== '`' ) $this->delimiters[] = $c;
 			elseif ( '`' === $c ) {
 				reset( $this->delimiters );
-				$this->parser = 'parseRawEnding';
+				$this->setParser( self::PARSE_RAW_ENDING );
 			}
 		}
+
+		const PARSE_RAW_ENDING = 'parseRawEnding';
 
 		private function parseRawEnding( $c ) {
 			$d = each( $this->delimiters );
 			$d[1] !== $c ? reset( $this->delimiters ) : $this->parseTerminal( $c );
 		}
+
+		const PARSE_ESCAPABLE = 'parseEscapable';
 
 		private function parseEscapable( $c ) {
 			if ( $this->escaping ) $this->escaping = false;
@@ -94,13 +122,21 @@ namespace atc {
 			else $this->parseTerminal( $c );
 		}
 
+		const PARSE_TERMINAL = 'parseTerminal';
+
 		private function parseTerminal( $c ) {
 			$top = end( $this->stack );
 			if ( false === $top ) return;
 			if ( self::$brackets[$top] === $c ) {
 				array_pop( $this->stack );
-				$this->parser = 'parseBracket';
+				$this->setParser( self::PARSE_BRACKET );
 			}
+		}
+
+		private function trim( $c ) {
+			$previous = $this->space;
+			$this->space = ord( ' ' ) >= ord( $c );
+			if ( !($previous && $this->space) ) $this->node->push( $c );
 		}
 
 		/**
@@ -108,6 +144,12 @@ namespace atc {
 		 * @var string
 		 */
 		private $parser;
+
+		/**
+		 * Method of pushing character to node.
+		 * @var callable
+		 */
+		private $pusher;
 
 		/**
 		 * @var ast
@@ -157,6 +199,12 @@ namespace atc {
 		private $delimiters;
 
 		/**
+		 * Is an invisible character?
+		 * @var boolean
+		 */
+		private $space;
+
+		/**
 		 * Bracket pairs.
 		 * @var array
 		 */
@@ -175,10 +223,10 @@ namespace atc {
 		 * @var array
 		 */
 		private static $literals = array(
-			'`' => 'parseRawString',
-			'"' => 'parseEscapable',
-			"'" => 'parseEscapable',
-			'#' => "parseTerminal",
+			'`' => self::PARSE_RAW_STRING,
+			'"' => self::PARSE_ESCAPABLE,
+			"'" => self::PARSE_ESCAPABLE,
+			'#' => self::PARSE_TERMINAL,
 		);
 
 	}
