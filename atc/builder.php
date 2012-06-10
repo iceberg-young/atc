@@ -24,6 +24,10 @@ namespace atc {
 			$this->stack = array( );
 			$this->escaping = false;
 
+			// Invisible literals.
+			$this->space = false;
+			$this->blank = true;
+
 			$this->setParser( self::PARSE_BRACKET );
 
 			$file = fopen( $path, 'r' );
@@ -31,10 +35,12 @@ namespace atc {
 				if ( "\n" === $c ) {
 					++$this->row;
 					$this->column = -1;
+					$this->blank = true;
 				}
 				else ++$this->column;
 				$this->{$this->parser}( $c );
 				call_user_func( $this->pusher, $c );
+				$this->blank = $this->blank && $this->space;
 			}
 			fclose( $file );
 		}
@@ -68,16 +74,26 @@ namespace atc {
 			switch ( $parser ) {
 				case self::PARSE_BRACKET:
 					$this->pusher = array( $this, 'trim' );
-					$this->space = false;
 					break;
 
 				case self::PARSE_ESCAPABLE:
 				case self::PARSE_RAW_STRING:
 				case self::PARSE_RAW_ENDING:
-				case self::PARSE_TERMINAL:
+					$this->space = false;
 					$this->pusher = array( $this->node, 'push' );
 					break;
 
+				case self::PARSE_COMMENT:
+					$this->space = true;
+					if ( !($this->comment && $this->blank && $this->comment->more( $this->row )) ) {
+						$this->markLocation();
+						$this->comment = $this->node->comment( $this->blank );
+					}
+					$this->pusher = array( $this->comment, 'push' );
+					$parser = self::PARSE_TERMINAL;
+					break;
+
+				case self::PARSE_TERMINAL:
 				default:
 					trigger_error( "Unexpected parser: $parser", E_USER_ERROR );
 			}
@@ -122,6 +138,7 @@ namespace atc {
 			else $this->parseTerminal( $c );
 		}
 
+		const PARSE_COMMENT = 'parseComment';
 		const PARSE_TERMINAL = 'parseTerminal';
 
 		private function parseTerminal( $c ) {
@@ -199,10 +216,22 @@ namespace atc {
 		private $delimiters;
 
 		/**
+		 * Comment.
+		 * @var part\comment
+		 */
+		private $comment;
+
+		/**
 		 * Is an invisible character?
 		 * @var boolean
 		 */
 		private $space;
+
+		/**
+		 * Is a blank line?
+		 * @var boolean
+		 */
+		private $blank;
 
 		/**
 		 * Bracket pairs.
@@ -226,7 +255,7 @@ namespace atc {
 			'`' => self::PARSE_RAW_STRING,
 			'"' => self::PARSE_ESCAPABLE,
 			"'" => self::PARSE_ESCAPABLE,
-			'#' => self::PARSE_TERMINAL,
+			'#' => self::PARSE_COMMENT,
 		);
 
 	}

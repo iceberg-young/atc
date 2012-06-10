@@ -22,7 +22,7 @@ namespace atc\ast\head {
 
 		/**
 		 * Is post condition?
-		 * @var bool
+		 * @var boolean
 		 */
 		private $post;
 
