@@ -13,11 +13,11 @@ namespace atc\ast\head {
 		}
 
 		protected function createLoop() {
-			$this->loop = $this->createDeriver( 'part\block', array( 'part\dirty' ), false );
+			$this->loop = $this->createDeriver( 'part\block', array( 'part\dirty' ) );
 		}
 
 		protected function createBody() {
-			$this->body = $this->createDeriver( 'part\block', array( 'body\call' ), false );
+			$this->body = $this->createDeriver( 'part\block', array( 'body\call' ) );
 		}
 
 		/**
@@ -43,16 +43,16 @@ namespace atc\ast\head {
 		 */
 		protected static $patterns = array(
 			array(
-				'trait' => '/>/',
+				'trait' => '>',
 				'build' => 'createPost',
 				'optional' => true,
 			),
 			array(
-				'trait' => '/\(/',
+				'trait' => '(',
 				'build' => 'createLoop',
 			),
 			array(
-				'trait' => '/{/',
+				'trait' => '{',
 				'build' => 'createBody',
 			),
 		);

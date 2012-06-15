@@ -7,12 +7,13 @@ namespace atc\ast\head {
 			return "SCOPE {$this->name} {\n{$this->body}\n}" . $this->getDebugLocation();
 		}
 
-		protected function createName() {
+		protected function createName( $c, $s ) {
 			$this->name = $this->createDeriver( 'part\name', array( false ) );
+			$this->name->push( $c, $s );
 		}
 
 		protected function createBody() {
-			$this->body = $this->createDeriver( 'part\block', array( 'body\scope' ), false );
+			$this->body = $this->createDeriver( 'part\block', array( 'body\scope' ) );
 		}
 
 		/**
@@ -32,12 +33,12 @@ namespace atc\ast\head {
 		 */
 		protected static $patterns = array(
 			array(
-				'trait' => '/[a-z]/i',
+				'trait' => '#[a-z]#i',
 				'build' => 'createName',
 				'optional' => true,
 			),
 			array(
-				'trait' => '/{/',
+				'trait' => '{',
 				'build' => 'createBody',
 			),
 		);

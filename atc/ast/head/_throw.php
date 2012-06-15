@@ -7,8 +7,9 @@ namespace atc\ast\head {
 			return "THROW {$this->oops};" . $this->getDebugLocation();
 		}
 
-		protected function createOops( $c ) {
+		protected function createOops( $c, $s ) {
 			$this->oops = $this->createDeriver( 'part\dirty' );
+			$this->oops->push( $c, $s );
 		}
 
 		private $oops;
@@ -19,11 +20,11 @@ namespace atc\ast\head {
 		 */
 		protected static $patterns = array(
 			array(
-				'trait' => '/./',
+				'trait' => '#.#',
 				'build' => 'createOops',
 			),
 			array(
-				'trait' => '/;/',
+				'trait' => ';',
 			),
 		);
 

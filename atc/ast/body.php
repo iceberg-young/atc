@@ -9,24 +9,33 @@ namespace atc\ast {
 			return implode( "\n", $this->children );
 		}
 
-		protected function filterDeriver( $fragment ) {
+		protected function filterDeriver( $c, $s ) {
 			if ( null === $this->options ) {
 				$this->options = static::$prefixes;
 			}
-			$type = static::FALLBACK;
-			$fragsize = strlen( $fragment );
-			foreach ( $this->options as $option => $length ) {
-				if ( $fragsize <= $length ) {
-					if ( substr( $option, 0, $fragsize ) === $fragment ) return;
+			if ( $this->length ) {
+				$type = static::FALLBACK;
+				foreach ( $this->options as $option => $length ) {
+					if ( $this->length < $length ) {
+						if ( substr( $option, 0, $this->length ) === $this->fragment ) return;
+					}
+					elseif ( preg_match( '/\W/', $c ) && ($this->fragment === $option) ) {
+						$type = "head\\_$option";
+						break;
+					}
+					unset( $this->options[$option] );
 				}
-				elseif ( preg_match( "/$option\W/", $fragment ) ) {
-					$type = "head\\_$option";
-					break;
+
+				$node = $this->createDeriver( $type );
+				if ( $node::UNDISTINGUISHABLE ) {
+					foreach ( str_split( $this->fragment ) as $p ) {
+						$node->push( $p, false );
+					}
 				}
-				unset( $this->options[$option] );
+				$node->push( $c, $s );
+				$this->children[] = $node;
+				$this->options = null;
 			}
-			$this->children[] = $this->createDeriver( $type );
-			$this->options = null;
 		}
 
 		/**

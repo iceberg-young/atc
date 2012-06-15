@@ -13,8 +13,8 @@ namespace atc\ast\part {
 			return $this->body->__toString();
 		}
 
-		public function push( $c ) {
-			if ( $this->isDeep() ) $this->body->push( $c );
+		public function push( $c, $s ) {
+			if ( $this->isDeep() ) $this->body->push( $c, $s );
 			else return true;
 		}
 

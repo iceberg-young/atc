@@ -36,32 +36,37 @@ namespace atc {
 			return $this->builder->getLevel() <= $this->location->level;
 		}
 
-		public function push( $c ) {
+		public function push( $c, $s ) {
 			if ( !$this->current ) {
-				if ( $this->intact && preg_match( '/\S/', $c ) ) {
+				if ( $this->intact && !$s ) {
 					$this->builder->markLocation();
 					$this->intact = false;
 					$this->fragment = '';
+					$this->length = 0;
 				}
 				if ( !$this->intact ) {
-					$this->fragment .= $c;
-					$status = $this->filterDeriver( $this->fragment );
+					$status = $this->filterDeriver( $c, $s );
 					if ( $status ) {
 						$this->intact = true;
 						$this->fragment = '';
-						$status = null;
+						$this->length = 0;
+						if ( !$this->ending ) $status = null;
+					}
+					else {
+						$this->fragment .= $c;
+						$this->length += strlen( $c );
 					}
 					return $status;
 				}
 			}
-			else return $this->transfer( $c );
+			else return $this->transfer( $c, $s );
 		}
 
 		public function comment( $blank ) {
 			if ( $this->current ) {
 				$comment = $this->current->comment( $blank );
 			}
-			else if ( !$blank && $this->previous ) {
+			elseif ( !$blank && $this->previous ) {
 				$comment = $this->previous->comment( $blank );
 			}
 			else {
@@ -71,23 +76,15 @@ namespace atc {
 			return $comment;
 		}
 
-		protected function createDeriver( $type, array $args = array( ), $transfer = true ) {
+		protected function createDeriver( $type, array $args = array( ) ) {
 			array_push( $args, $this->builder, $this );
 			$class = new \ReflectionClass( "atc\\ast\\$type" );
 			$this->previous = $this->current;
 			$this->current = $class->newInstanceArgs( $args );
-			if ( $transfer ) {
-				if ( $class->getConstant( 'UNDISTINGUISHABLE' ) ) {
-					foreach ( str_split( $this->fragment ) as $p ) {
-						$this->transfer( $p );
-					}
-				}
-				else $this->transfer( substr( $this->fragment, -1 ) );
-			}
 			return $this->current;
 		}
 
-		protected function filterDeriver( array $fragment ) {
+		protected function filterDeriver( $c, $s ) {
 			trigger_error( __METHOD__ . ' must be overrided!', E_USER_ERROR );
 		}
 
@@ -99,14 +96,14 @@ namespace atc {
 			$this->ending = true;
 		}
 
-		private function transfer( $c ) {
-			$status = $this->current->push( $c );
+		private function transfer( $c, $s ) {
+			$status = $this->current->push( $c, $s );
 			if ( null !== $status ) {
 				$this->previous = $this->current;
 				$this->current = null;
 				$this->intact = true;
 				$this->builder->clearLocation();
-				if ( !$status ) return $this->push( $c );
+				if ( !$status ) return $this->push( $c, $s );
 				elseif ( $this->ending ) return true;
 			}
 		}
@@ -115,7 +112,13 @@ namespace atc {
 		 * Pushed part during deriver filtering.
 		 * @var string
 		 */
-		private $fragment;
+		protected $fragment;
+
+		/**
+		 * Length of $fragment.
+		 * @var number
+		 */
+		protected $length;
 
 		/**
 		 * Current node.

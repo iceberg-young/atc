@@ -7,12 +7,14 @@ namespace atc\ast\head {
 			return "ALIAS {$this->alias} = {$this->refer};" . $this->getDebugLocation();
 		}
 
-		protected function createAlias( $c ) {
+		protected function createAlias( $c, $s ) {
 			$this->alias = $this->createDeriver( 'part\name', array( false ) );
+			$this->alias->push( $c, $s );
 		}
 
-		protected function createRefer( $c ) {
+		protected function createRefer( $c, $s ) {
 			$this->refer = $this->createDeriver( 'part\name', array( true ) );
+			$this->refer->push( $c, $s );
 		}
 
 		/**
@@ -31,18 +33,18 @@ namespace atc\ast\head {
 		 */
 		protected static $patterns = array(
 			array(
-				'trait' => '/[a-z]/i',
+				'trait' => '#[a-z]#i',
 				'build' => 'createAlias',
 			),
 			array(
-				'trait' => '/=/',
+				'trait' => '=',
 			),
 			array(
-				'trait' => '/[a-z]/i',
+				'trait' => '#[a-z]#i',
 				'build' => 'createRefer',
 			),
 			array(
-				'trait' => '/;/',
+				'trait' => ';',
 			),
 		);
 

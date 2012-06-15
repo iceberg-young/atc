@@ -7,12 +7,14 @@ namespace atc\ast\head {
 			return "USE {$this->name} = {$this->value};" . $this->getDebugLocation();
 		}
 
-		protected function createName( $c ) {
+		protected function createName( $c, $s ) {
 			$this->name = $this->createDeriver( 'part\name', array( false ) );
+			$this->name->push( $c, $s );
 		}
 
-		protected function createValue( $c ) {
+		protected function createValue( $c, $s ) {
 			$this->value = $this->createDeriver( 'part\dirty' );
+			$this->value->push( $c, $s );
 		}
 
 		private $name;
@@ -24,18 +26,20 @@ namespace atc\ast\head {
 		 */
 		protected static $patterns = array(
 			array(
-				'trait' => '/[a-z]/i',
+				'trait' => '#[a-z]#i',
 				'build' => 'createName',
+				're' => true,
 			),
 			array(
-				'trait' => '/=/',
+				'trait' => '=',
 			),
 			array(
-				'trait' => '/./',
+				'trait' => '#.#',
 				'build' => 'createValue',
+				're' => true,
 			),
 			array(
-				'trait' => '/;/',
+				'trait' => ';',
 			),
 		);
 

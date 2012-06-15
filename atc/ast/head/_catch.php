@@ -8,11 +8,11 @@ namespace atc\ast\head {
 		}
 
 		protected function createOops() {
-			$this->oops = $this->createDeriver( 'part\block', array( 'part\dirty' ), false );
+			$this->oops = $this->createDeriver( 'part\block', array( 'part\dirty' ) );
 		}
 
 		protected function createBody() {
-			$this->body = $this->createDeriver( 'part\block', array( 'body\call' ), false );
+			$this->body = $this->createDeriver( 'part\block', array( 'body\call' ) );
 		}
 
 		/**
@@ -32,11 +32,11 @@ namespace atc\ast\head {
 		 */
 		protected static $patterns = array(
 			array(
-				'trait' => '/\(/',
+				'trait' => '(',
 				'build' => 'createOops',
 			),
 			array(
-				'trait' => '/{/',
+				'trait' => '{',
 				'build' => 'createBody',
 			),
 		);

@@ -8,11 +8,11 @@ namespace atc\ast\head {
 		}
 
 		protected function createCondition() {
-			$this->condition = $this->createDeriver( 'part\block', array( 'part\dirty' ), false );
+			$this->condition = $this->createDeriver( 'part\block', array( 'part\dirty' ) );
 		}
 
 		protected function createBody() {
-			$this->body = $this->createDeriver( 'part\block', array( 'body\call' ), false );
+			$this->body = $this->createDeriver( 'part\block', array( 'body\call' ) );
 		}
 
 		/**
@@ -32,11 +32,11 @@ namespace atc\ast\head {
 		 */
 		protected static $patterns = array(
 			array(
-				'trait' => '/\(/',
+				'trait' => '(',
 				'build' => 'createCondition',
 			),
 			array(
-				'trait' => '/{/',
+				'trait' => '{',
 				'build' => 'createBody',
 			),
 		);

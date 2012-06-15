@@ -7,8 +7,8 @@ namespace atc\ast\head {
 			return "INCLUDE \"{$this->path}\";" . $this->getDebugLocation();
 		}
 
-		protected function createPath( $c ) {
-			$this->path = $this->createDeriver( 'part\string', array( $c ), false );
+		protected function createPath( $c, $s ) {
+			$this->path = $this->createDeriver( 'part\string', array( $c ) );
 		}
 
 		/**
@@ -22,11 +22,12 @@ namespace atc\ast\head {
 		 */
 		protected static $patterns = array(
 			array(
-				'trait' => '/[`"\']/',
+				'trait' => '#[`"\']#',
 				'build' => 'createPath',
+				're' => true,
 			),
 			array(
-				'trait' => '/;/',
+				'trait' => ';',
 			),
 		);
 
