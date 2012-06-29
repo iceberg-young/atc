@@ -1,10 +1,10 @@
 <?php
 namespace atc\ast\head {
 
-	class _use extends \atc\ast\head {
+	class _new extends \atc\ast\head {
 
 		public function __toString() {
-			return "USE {$this->name} = {$this->value};" . $this->getDebugLocation();
+			return "NEW {$this->name} = {$this->value};" . $this->getDebugLocation();
 		}
 
 		protected function createName( $c, $s ) {
