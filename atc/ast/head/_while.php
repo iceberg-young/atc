@@ -12,8 +12,9 @@ namespace atc\ast\head {
 			return $this->post = true;
 		}
 
-		protected function createLoop() {
-			$this->loop = $this->createDeriver( 'part\block', array( 'part\dirty' ) );
+		protected function createLoop( $c, $s ) {
+			$this->loop = $this->createDeriver( 'part\before', array( 'part\dirty' ) );
+			$this->loop->push( $c, $s );
 		}
 
 		protected function createBody() {
@@ -48,7 +49,6 @@ namespace atc\ast\head {
 				'optional' => true,
 			),
 			array(
-				'trait' => '(',
 				'build' => 'createLoop',
 			),
 			array(

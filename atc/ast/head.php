@@ -11,19 +11,22 @@ namespace atc\ast {
 			$count = self::$pattern_amounts[$deriver];
 			while ( $count > $this->cursor ) {
 				$pattern = static::$patterns[$this->cursor++];
-				$trait = $pattern['trait'];
-				$length = strlen( $trait );
+				if ( isset( $pattern['trait'] ) ) {
+					$trait = $pattern['trait'];
+					$length = strlen( $trait );
 
-				if ( 1 === $length ) {
-					$match = $trait === $c;
+					if ( 1 === $length ) {
+						$match = $trait === $c;
+					}
+					elseif ( '#' === $trait{0} ) {
+						$match = preg_match( $trait, $c );
+					}
+					elseif ( $this->length === $length ) {
+						$match = preg_match( '/\W/', $c ) && ($pattern['trait'] === $this->fragment);
+					}
+					else return;
 				}
-				elseif ( '#' === $trait{0} ) {
-					$match = preg_match( $trait, $c );
-				}
-				elseif ( $this->length === $length ) {
-					$match = preg_match( '/\W/', $c ) && ($pattern['trait'] === $this->fragment);
-				}
-				else return;
+				else $match = true;
 
 				if ( $match ) {
 					if ( $count === $this->cursor ) $this->markEnding();

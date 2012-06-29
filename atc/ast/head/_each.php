@@ -7,8 +7,9 @@ namespace atc\ast\head {
 			return "EACH ({$this->loop}) {\n{$this->body}\n}" . $this->getDebugLocation();
 		}
 
-		protected function createLoop() {
-			$this->loop = $this->createDeriver( 'part\block', array( 'part\dirty' ) );
+		protected function createLoop( $c, $s ) {
+			$this->loop = $this->createDeriver( 'part\before', array( 'part\dirty' ) );
+			$this->loop->push( $c, $s );
 		}
 
 		protected function createBody() {
@@ -32,7 +33,6 @@ namespace atc\ast\head {
 		 */
 		protected static $patterns = array(
 			array(
-				'trait' => '(',
 				'build' => 'createLoop',
 			),
 			array(
