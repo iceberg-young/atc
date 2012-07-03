@@ -28,15 +28,12 @@ namespace atc\ast\head {
 			array(
 				'trait' => '#[a-z]#i',
 				'build' => 'createName',
-				're' => true,
 			),
 			array(
 				'trait' => '=',
 			),
 			array(
-				'trait' => '#.#',
 				'build' => 'createValue',
-				're' => true,
 			),
 			array(
 				'trait' => ';',

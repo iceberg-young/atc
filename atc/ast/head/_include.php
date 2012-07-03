@@ -24,7 +24,6 @@ namespace atc\ast\head {
 			array(
 				'trait' => '#[`"\']#',
 				'build' => 'createPath',
-				're' => true,
 			),
 			array(
 				'trait' => ';',

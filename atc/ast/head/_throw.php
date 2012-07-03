@@ -20,7 +20,6 @@ namespace atc\ast\head {
 		 */
 		protected static $patterns = array(
 			array(
-				'trait' => '#.#',
 				'build' => 'createOops',
 			),
 			array(
