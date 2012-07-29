@@ -3,7 +3,7 @@ namespace atc\ast {
 
 	class head extends \atc\ast {
 
-		protected function filterDeriver( $c, $s ) {
+		protected function filterDeriver() {
 			$deriver = get_called_class();
 			if ( !isset( self::$pattern_amounts[$deriver] ) ) {
 				self::$pattern_amounts[$deriver] = count( static::$patterns );
@@ -16,26 +16,31 @@ namespace atc\ast {
 					$length = strlen( $trait );
 
 					if ( 1 === $length ) {
-						$match = $trait === $c;
+						$match = $trait === $this->fresh;
 					}
 					elseif ( '#' === $trait{0} ) {
-						$match = preg_match( $trait, $c );
+						$match = preg_match( $trait, $this->fresh );
 					}
 					elseif ( $this->length === $length ) {
-						$match = preg_match( '/\W/', $c ) && ($pattern['trait'] === $this->fragment);
+						$match = preg_match( '/\W/', $this->fresh ) && ($pattern['trait'] === $this->fragment);
 					}
-					else return;
+					else return \atc\ast::FILTER_CONTINUE;
 				}
 				else $match = true;
 
 				if ( $match ) {
 					if ( $count === $this->cursor ) $this->markEnding();
-					return isset( $pattern['build'] ) ? $this->{$pattern['build']}( $c, $s ) : true;
+					if ( isset( $pattern['build'] ) ) {
+						$this->{$pattern['build']}();
+						return \atc\ast::FILTER_COMPLETE;
+					}
+					else return \atc\ast::FILTER_TERMINAL;
 				}
 				elseif ( !isset( $pattern['optional'] ) ) {
-					trigger_error( "unexpected {$this->fragment}($c)", E_USER_ERROR );
+					trigger_error( "unexpected {$this->fragment}({$this->fresh})", E_USER_ERROR );
 				}
 			}
+			trigger_error( "out of patterns", E_USER_ERROR );
 		}
 
 		/**

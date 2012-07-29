@@ -9,32 +9,30 @@ namespace atc\ast {
 			return implode( "\n", $this->children );
 		}
 
-		protected function filterDeriver( $c, $s ) {
-			if ( null === $this->options ) {
-				$this->options = static::$prefixes;
-			}
+		protected function filterDeriver() {
 			if ( $this->length ) {
 				$type = static::FALLBACK;
+				$more = preg_match( '/\w/', $this->fresh );
 				foreach ( $this->options as $option => $length ) {
-					if ( $this->length < $length ) {
-						if ( substr( $option, 0, $this->length ) === $this->fragment ) return;
+					if (!$more) {
+						if ($this->fragment === $option) {
+							$type = "head\\_$option";
+							break;
+						}
 					}
-					elseif ( preg_match( '/\W/', $c ) && ($this->fragment === $option) ) {
-						$type = "head\\_$option";
-						break;
+					elseif ( ($this->length < $length) && (substr( $option, 0, $this->length ) === $this->fragment) ) {
+						return \atc\ast::FILTER_CONTINUE;
 					}
 					unset( $this->options[$option] );
 				}
 
-				$node = $this->createDeriver( $type );
-				if ( $node::UNDISTINGUISHABLE ) {
-					foreach ( str_split( $this->fragment ) as $p ) {
-						$node->push( $p, false );
-					}
-				}
-				$node->push( $c, $s );
-				$this->children[] = $node;
+				$this->children[] = $this->createDeriver( $type );
 				$this->options = null;
+				return \atc\ast::FILTER_COMPLETE;
+			}
+			else {
+				$this->options = static::$prefixes;
+				return \atc\ast::FILTER_CONTINUE;
 			}
 		}
 

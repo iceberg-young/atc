@@ -9,6 +9,7 @@ namespace atc\ast\part {
 
 		public function push( $c ) {
 			$this->prefix ? $this->prefix = false : $this->content .= $c;
+			return parent::PUSH_CONTINUE;
 		}
 
 		public function more( $row ) {

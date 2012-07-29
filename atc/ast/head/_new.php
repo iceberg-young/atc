@@ -7,14 +7,12 @@ namespace atc\ast\head {
 			return "NEW {$this->name} = {$this->value};" . $this->getDebugLocation();
 		}
 
-		protected function createName( $c, $s ) {
+		protected function createName() {
 			$this->name = $this->createDeriver( 'part\name', array( false ) );
-			$this->name->push( $c, $s );
 		}
 
-		protected function createValue( $c, $s ) {
+		protected function createValue() {
 			$this->value = $this->createDeriver( 'part\dirty' );
-			$this->value->push( $c, $s );
 		}
 
 		private $name;

@@ -13,8 +13,11 @@ namespace atc\ast\part {
 		}
 
 		public function push( $c ) {
-			if ( preg_match( $this->rule, $c ) ) $this->content .= $c;
-			else return false;
+			if ( preg_match( $this->rule, $c ) ) {
+				$this->content .= $c;
+				return parent::PUSH_CONTINUE;
+			}
+			else return parent::PUSH_OVERFLOW;
 		}
 
 		/**

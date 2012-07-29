@@ -3,6 +3,8 @@ namespace atc\ast\part {
 
 	class block extends \atc\ast {
 
+		const DERIVER_PUSH = parent::DERIVER_PUSH_NONE;
+
 		public function __construct( $type, \atc\builder $builder, $parent = null ) {
 			parent::__construct( $builder, $parent );
 			$content = "\\atc\\ast\\$type";
@@ -14,8 +16,11 @@ namespace atc\ast\part {
 		}
 
 		public function push( $c, $s ) {
-			if ( $this->isDeep() ) $this->body->push( $c, $s );
-			else return true;
+			if ( $this->isDeep() ) {
+				$this->body->push( $c, $s );
+				return parent::PUSH_CONTINUE;
+			}
+			else return parent::PUSH_COMPLETE;
 		}
 
 		/**

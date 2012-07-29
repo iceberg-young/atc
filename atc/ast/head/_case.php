@@ -7,9 +7,8 @@ namespace atc\ast\head {
 			return "CASE {$this->name} {\n{$this->body}\n}" . $this->getDebugLocation();
 		}
 
-		protected function createName( $c, $s ) {
+		protected function createName() {
 			$this->name = $this->createDeriver( 'part\before', array( 'part\dirty' ) );
-			$this->name->push( $c, $s );
 		}
 
 		protected function createBody() {

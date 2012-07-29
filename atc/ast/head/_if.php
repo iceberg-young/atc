@@ -7,9 +7,8 @@ namespace atc\ast\head {
 			return "IF ({$this->condition}) {\n{$this->body}\n}" . $this->getDebugLocation();
 		}
 
-		protected function createCondition( $c, $s ) {
+		protected function createCondition() {
 			$this->condition = $this->createDeriver( 'part\before', array( 'part\dirty' ) );
-			$this->condition->push( $c, $s );
 		}
 
 		protected function createBody() {

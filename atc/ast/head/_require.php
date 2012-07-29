@@ -7,8 +7,8 @@ namespace atc\ast\head {
 			return "REQUIRE \"{$this->path}\";" . $this->getDebugLocation();
 		}
 
-		protected function createPath( $c, $s ) {
-			$this->path = $this->createDeriver( 'part\string', array( $c ) );
+		protected function createPath() {
+			$this->path = $this->createDeriver( 'part\string' );
 		}
 
 		/**

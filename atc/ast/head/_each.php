@@ -7,9 +7,8 @@ namespace atc\ast\head {
 			return "EACH ({$this->loop}) {\n{$this->body}\n}" . $this->getDebugLocation();
 		}
 
-		protected function createLoop( $c, $s ) {
+		protected function createLoop() {
 			$this->loop = $this->createDeriver( 'part\before', array( 'part\dirty' ) );
-			$this->loop->push( $c, $s );
 		}
 
 		protected function createBody() {

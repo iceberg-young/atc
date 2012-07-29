@@ -7,9 +7,8 @@ namespace atc\ast\head {
 			return "THROW {$this->oops};" . $this->getDebugLocation();
 		}
 
-		protected function createOops( $c, $s ) {
+		protected function createOops() {
 			$this->oops = $this->createDeriver( 'part\dirty' );
-			$this->oops->push( $c, $s );
 		}
 
 		private $oops;

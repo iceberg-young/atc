@@ -7,9 +7,8 @@ namespace atc\ast\head {
 			return "SCOPE {$this->name} {\n{$this->body}\n}" . $this->getDebugLocation();
 		}
 
-		protected function createName( $c, $s ) {
+		protected function createName() {
 			$this->name = $this->createDeriver( 'part\name', array( false ) );
-			$this->name->push( $c, $s );
 		}
 
 		protected function createBody() {

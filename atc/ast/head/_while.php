@@ -12,9 +12,8 @@ namespace atc\ast\head {
 			return $this->post = true;
 		}
 
-		protected function createLoop( $c, $s ) {
+		protected function createLoop() {
 			$this->loop = $this->createDeriver( 'part\before', array( 'part\dirty' ) );
-			$this->loop->push( $c, $s );
 		}
 
 		protected function createBody() {

@@ -7,14 +7,12 @@ namespace atc\ast\head {
 			return "ALIAS {$this->alias} = {$this->refer};" . $this->getDebugLocation();
 		}
 
-		protected function createAlias( $c, $s ) {
+		protected function createAlias() {
 			$this->alias = $this->createDeriver( 'part\name', array( false ) );
-			$this->alias->push( $c, $s );
 		}
 
-		protected function createRefer( $c, $s ) {
+		protected function createRefer() {
 			$this->refer = $this->createDeriver( 'part\name', array( true ) );
-			$this->refer->push( $c, $s );
 		}
 
 		/**

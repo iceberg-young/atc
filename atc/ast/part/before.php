@@ -14,8 +14,11 @@ namespace atc\ast\part {
 		}
 
 		public function push( $c, $s ) {
-			if ( '{' === $c ) return false;
-			else $this->body->push( $c, $s );
+			if ( '{' !== $c ) {
+				$this->body->push( $c, $s );
+				return parent::PUSH_CONTINUE;
+			}
+			else return parent::PUSH_OVERFLOW;
 		}
 
 		/**

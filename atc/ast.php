@@ -3,8 +3,6 @@ namespace atc {
 
 	abstract class ast {
 
-		const UNDISTINGUISHABLE = false;
-
 		public function __construct( builder $builder, $parent = null ) {
 			$this->builder = $builder;
 			$this->parent = $parent;
@@ -36,30 +34,44 @@ namespace atc {
 			return $this->builder->getLevel() <= $this->location->level;
 		}
 
+		const PUSH_CONTINUE = 'continue';
+		const PUSH_COMPLETE = 'complete';
+		const PUSH_OVERFLOW = 'overflow';
+
 		public function push( $c, $s ) {
+			$this->fresh = $c;
+			$this->space = $s;
 			if ( !$this->current ) {
-				if ( $this->intact && !$s ) {
+				$status = self::PUSH_CONTINUE;
+				if ( $this->intact && !$this->space ) {
 					$this->builder->markLocation();
 					$this->intact = false;
 					$this->fragment = '';
 					$this->length = 0;
 				}
 				if ( !$this->intact ) {
-					$status = $this->filterDeriver( $c, $s );
-					if ( $status ) {
-						$this->intact = true;
-						$this->fragment = '';
-						$this->length = 0;
-						if ( !$this->ending ) $status = null;
+					switch ( $this->filterDeriver() ) {
+						case self::FILTER_CONTINUE:
+							if ( $this->space ) trigger_error( "unexpected space in pending part.", E_USER_ERROR );
+							$this->fragment .= $this->fresh;
+							$this->length += strlen( $this->fresh );
+							break;
+
+						case self::FILTER_TERMINAL:
+							if ( $this->ending ) {
+								$status = self::PUSH_COMPLETE;
+							} // goto FILTER_COMPLETE
+
+						case self::FILTER_COMPLETE:
+							$this->intact = true;
+							$this->fragment = '';
+							$this->length = 0;
+							break;
 					}
-					else {
-						$this->fragment .= $c;
-						$this->length += strlen( $c );
-					}
-					return $status;
 				}
 			}
-			else return $this->transfer( $c, $s );
+			else $status = $this->transfer();
+			return $status;
 		}
 
 		public function comment( $blank ) {
@@ -76,15 +88,42 @@ namespace atc {
 			return $comment;
 		}
 
+		const DERIVER_PUSH_PEND = 'pend';
+		const DERIVER_PUSH_LAST = 'last';
+		const DERIVER_PUSH_NONE = 'none';
+		const DERIVER_PUSH = self::DERIVER_PUSH_LAST;
+
 		protected function createDeriver( $type, array $args = array( ) ) {
 			array_push( $args, $this->builder, $this );
 			$class = new \ReflectionClass( "atc\\ast\\$type" );
 			$this->previous = $this->current;
 			$this->current = $class->newInstanceArgs( $args );
+
+			switch ( $class->getConstant( 'DERIVER_PUSH' ) ) {
+				case self::DERIVER_PUSH_PEND:
+					foreach ( str_split( $this->fragment ) as $p ) {
+						$status = $this->current->push( $p, false );
+						if ( ast::PUSH_CONTINUE !== $status ) {
+							trigger_error( "cannot back off ($type) when create deriver", E_USER_WARNING );
+						}
+					} // goto DERIVER_PUSH_LAST
+
+				case self::DERIVER_PUSH_LAST:
+					$status = $this->current->push( $this->fresh, $this->space );
+					if ( ast::PUSH_OVERFLOW === $status ) {
+						trigger_error( "cannot back off ($type) when create deriver", E_USER_WARNING );
+					}
+					break;
+			}
+
 			return $this->current;
 		}
 
-		protected function filterDeriver( $c, $s ) {
+		const FILTER_CONTINUE = 'continue';
+		const FILTER_COMPLETE = 'complete';
+		const FILTER_TERMINAL = 'terminal';
+
+		protected function filterDeriver() {
 			trigger_error( __METHOD__ . ' must be overrided!', E_USER_ERROR );
 		}
 
@@ -96,16 +135,17 @@ namespace atc {
 			$this->ending = true;
 		}
 
-		private function transfer( $c, $s ) {
-			$status = $this->current->push( $c, $s );
-			if ( null !== $status ) {
+		private function transfer() {
+			$status = $this->current->push( $this->fresh, $this->space );
+			if ( self::PUSH_CONTINUE !== $status ) {
 				$this->previous = $this->current;
 				$this->current = null;
 				$this->intact = true;
 				$this->builder->clearLocation();
-				if ( !$status ) return $this->push( $c, $s );
-				elseif ( $this->ending ) return true;
+				if ( self::PUSH_OVERFLOW === $status ) $status = $this->push( $this->fresh, $this->space );
+				elseif ( !$this->ending ) $status = self::PUSH_CONTINUE;
 			}
+			return $status;
 		}
 
 		/**
@@ -113,6 +153,18 @@ namespace atc {
 		 * @var string
 		 */
 		protected $fragment;
+
+		/**
+		 * Newly pushed literal.
+		 * @var string
+		 */
+		protected $fresh;
+
+		/**
+		 * Space indicator of newly pushed literal.
+		 * @var boolean
+		 */
+		protected $space;
 
 		/**
 		 * Length of $fragment.

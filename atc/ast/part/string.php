@@ -3,10 +3,9 @@ namespace atc\ast\part {
 
 	class string extends \atc\ast {
 
-		public function __construct( $type, \atc\builder $builder, $parent = null ) {
+		public function __construct( \atc\builder $builder, $parent = null ) {
 			parent::__construct( $builder, $parent );
-			$this->type = $type;
-			$this->parser = 'parseContent';
+			$this->parser = 'parseType';
 		}
 
 		public function __toString() {
@@ -15,6 +14,12 @@ namespace atc\ast\part {
 
 		public function push( $c ) {
 			return $this->{$this->parser}( $c );
+		}
+
+		private function parseType( $c ) {
+			$this->type = $c;
+			$this->parser = 'parseContent';
+			return parent::PUSH_CONTINUE;
 		}
 
 		private function parseContent( $c ) {
@@ -29,11 +34,15 @@ namespace atc\ast\part {
 				$this->parser = 'parseSuffix';
 			}
 			else $this->content .= $c;
+			return parent::PUSH_CONTINUE;
 		}
 
 		private function parseSuffix( $c ) {
-			if ( preg_match( '/[a-z]/i', $c ) ) $this->suffix .= $c;
-			else return false;
+			if ( preg_match( '/[a-z]/i', $c ) ) {
+				$this->suffix .= $c;
+				return parent::PUSH_CONTINUE;
+			}
+			else return parent::PUSH_OVERFLOW;
 		}
 
 		/**
