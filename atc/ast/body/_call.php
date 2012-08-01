@@ -17,6 +17,7 @@ namespace atc\ast\body {
 			'if' => 2,
 			'else' => 4,
 			'switch' => 6,
+			'veer' => 4,
 			'try' => 3,
 			'catch' => 5,
 			'throw' => 5,
@@ -24,6 +25,7 @@ namespace atc\ast\body {
 			'loop' => 4,
 			'break' => 5,
 			'rewind' => 6,
+			'return' => 6,
 		);
 
 	}
