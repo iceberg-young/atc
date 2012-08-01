@@ -1,7 +1,7 @@
 <?php
 namespace atc\ast\body {
 
-	class call extends \atc\ast\body {
+	class _call extends \atc\ast\body {
 
 		const FALLBACK = 'statement';
 
@@ -22,6 +22,7 @@ namespace atc\ast\body {
 			'throw' => 5,
 			'each' => 4,
 			'while' => 5,
+			'break' => 5,
 		);
 
 	}

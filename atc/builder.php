@@ -6,10 +6,10 @@ namespace atc {
 		public function parse( $path ) {
 			switch ( strrchr( $path, '.' ) ) {
 				case '.ate':
-					$this->node = new ast\body\call( $this );
+					$this->node = new ast\body\_call( $this );
 					break;
 				case '.atd':
-					$this->node = new ast\body\file( $this );
+					$this->node = new ast\body\_file( $this );
 					break;
 				default:
 					die( "I don't know how to deal with $path." );

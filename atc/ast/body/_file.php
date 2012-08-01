@@ -1,7 +1,7 @@
 <?php
 namespace atc\ast\body {
 
-	class file extends \atc\ast\body {
+	class _file extends \atc\ast\body {
 
 		/**
 		 * Override parent's.

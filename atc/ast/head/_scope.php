@@ -12,7 +12,7 @@ namespace atc\ast\head {
 		}
 
 		protected function createBody() {
-			$this->body = $this->createDeriver( 'part\block', array( 'body\scope' ) );
+			$this->body = $this->createDeriver( 'part\block', array( 'body\_scope' ) );
 		}
 
 		/**

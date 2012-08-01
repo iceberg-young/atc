@@ -1,7 +1,7 @@
 <?php
 namespace atc\ast\body {
 
-	class scope extends \atc\ast\body {
+	class _scope extends \atc\ast\body {
 
 		/**
 		 * Override parent's.
