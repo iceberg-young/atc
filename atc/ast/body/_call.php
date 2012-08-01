@@ -21,8 +21,9 @@ namespace atc\ast\body {
 			'catch' => 5,
 			'throw' => 5,
 			'each' => 4,
-			'while' => 5,
+			'loop' => 4,
 			'break' => 5,
+			'rewind' => 6,
 		);
 
 	}
