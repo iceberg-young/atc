@@ -10,8 +10,8 @@ Weird Ideas
   - Prefer unique meaning of each operator.
     E.g. in C++
 
-    - `&` can be get address, or bit and;
-    - `*` can be multiply, or dereference.
+    - `&` can get address, or bit and;
+    - `*` can multiply, or dereference.
 
     *AT* tries to avoid this.
 
@@ -36,8 +36,8 @@ Weird Ideas
   - Single command to build, no link required.
 
 
-Source File
------------
+File Extensions
+---------------
 
 There are 2 type of source file.
 
@@ -77,31 +77,83 @@ Literals may have suffix (to be determined).
 Key Words
 ---------
 
+### Definition
+
+  - `call`
+  - `class`
+  - `scope`
+  - `unit`
+
+
+### Declaration
+
   - `alias`
   - `base`
+  - `new`
+
+
+### Jump
+
   - `break`
-  - `call`
+  - `rewind`
+  - `return`
+  - `throw`
+  - `veer`
+
+
+### Block
+
   - `case`
   - `catch`
-  - `class`
   - `each`
   - `else`
   - `if`
-  - `in`
-  - `include`
-  - `new`
-  - `of`
-  - `require`
-  - `scope`
+  - `loop`
   - `switch`
-  - `throw`
   - `try`
-  - `unit`
-  - `while`
+
+
+### Preposition
+
+  - `in`
+  - `of`
+
+
+### Reference
+
+  - `include`
+  - `require`
+
+
+### Value
 
   - `null`
   - `true`
   - `false`
+
+
+Macros
+------
+
+### Fungible
+
+  - `_call`
+  - `_case`
+  - `_class`
+  - `_loop`
+  - `_scope`
+
+
+### String
+
+  - `_call_`
+  - `_case_`
+  - `_class_`
+  - `_file_`
+  - `_line_`
+  - `_loop_`
+  - `_scope_`
+
 
 Operators
 ---------
