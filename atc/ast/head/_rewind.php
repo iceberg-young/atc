@@ -4,14 +4,8 @@ namespace atc\ast\head {
 	class _rewind extends \atc\ast\head {
 
 		public function __toString() {
-			return "REWIND {$this->name};" . $this->getDebugLocation();
+			return "REWIND {$this->link};" . $this->getDebugLocation();
 		}
-
-		protected function createName() {
-			$this->name = $this->createDeriver( 'part\name', array( false ) );
-		}
-
-		private $name;
 
 		/**
 		 * Override parent's.
@@ -19,8 +13,7 @@ namespace atc\ast\head {
 		 */
 		protected static $patterns = array(
 			array(
-				'trait' => '#[a-z]#i',
-				'build' => 'createName',
+				'template' => 'link',
 				'optional' => true,
 			),
 			array(

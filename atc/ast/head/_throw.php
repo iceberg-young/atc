@@ -8,10 +8,8 @@ namespace atc\ast\head {
 		}
 
 		protected function createOops() {
-			$this->oops = $this->createDeriver( 'part\dirty' );
+			return $this->createDeriver( 'part\dirty' );
 		}
-
-		private $oops;
 
 		/**
 		 * Override parent's.
@@ -19,7 +17,7 @@ namespace atc\ast\head {
 		 */
 		protected static $patterns = array(
 			array(
-				'build' => 'createOops',
+				'template' => 'oops',
 			),
 			array(
 				'trait' => ';',

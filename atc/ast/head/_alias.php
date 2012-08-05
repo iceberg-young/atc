@@ -4,26 +4,8 @@ namespace atc\ast\head {
 	class _alias extends \atc\ast\head {
 
 		public function __toString() {
-			return "ALIAS {$this->alias} = {$this->refer};" . $this->getDebugLocation();
+			return "ALIAS {$this->name} : {$this->link};" . $this->getDebugLocation();
 		}
-
-		protected function createAlias() {
-			$this->alias = $this->createDeriver( 'part\name', array( false ) );
-		}
-
-		protected function createRefer() {
-			$this->refer = $this->createDeriver( 'part\name', array( true ) );
-		}
-
-		/**
-		 * @var \atc\ast\part\name
-		 */
-		private $alias;
-
-		/**
-		 * @var \atc\ast\part\name
-		 */
-		private $refer;
 
 		/**
 		 * Override parent's.
@@ -31,15 +13,13 @@ namespace atc\ast\head {
 		 */
 		protected static $patterns = array(
 			array(
-				'trait' => '#[a-z]#i',
-				'build' => 'createAlias',
+				'template' => 'name',
 			),
 			array(
-				'trait' => '=',
+				'trait' => ':',
 			),
 			array(
-				'trait' => '#[a-z]#i',
-				'build' => 'createRefer',
+				'template' => 'link',
 			),
 			array(
 				'trait' => ';',

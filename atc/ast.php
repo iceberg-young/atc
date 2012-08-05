@@ -173,6 +173,12 @@ namespace atc {
 		protected $length;
 
 		/**
+		 * Inferior nodes.
+		 * @var array
+		 */
+		protected $children = array( );
+
+		/**
 		 * Current node.
 		 * @var \atc\ast
 		 */

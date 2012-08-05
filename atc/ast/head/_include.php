@@ -7,23 +7,13 @@ namespace atc\ast\head {
 			return "INCLUDE \"{$this->path}\";" . $this->getDebugLocation();
 		}
 
-		protected function createPath() {
-			$this->path = $this->createDeriver( 'part\string' );
-		}
-
-		/**
-		 * @var \atc\ast\part\string
-		 */
-		private $path;
-
 		/**
 		 * Override parent's.
 		 * @var array
 		 */
 		protected static $patterns = array(
 			array(
-				'trait' => '#[`"\']#',
-				'build' => 'createPath',
+				'template' => 'path',
 			),
 			array(
 				'trait' => ';',

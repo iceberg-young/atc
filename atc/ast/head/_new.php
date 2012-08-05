@@ -4,19 +4,12 @@ namespace atc\ast\head {
 	class _new extends \atc\ast\head {
 
 		public function __toString() {
-			return "NEW {$this->name} = {$this->value};" . $this->getDebugLocation();
-		}
-
-		protected function createName() {
-			$this->name = $this->createDeriver( 'part\name', array( false ) );
+			return "NEW {$this->name} : {$this->value};" . $this->getDebugLocation();
 		}
 
 		protected function createValue() {
-			$this->value = $this->createDeriver( 'part\dirty' );
+			return $this->createDeriver( 'part\dirty' );
 		}
-
-		private $name;
-		private $value;
 
 		/**
 		 * Override parent's.
@@ -24,14 +17,13 @@ namespace atc\ast\head {
 		 */
 		protected static $patterns = array(
 			array(
-				'trait' => '#[a-z]#i',
-				'build' => 'createName',
+				'template' => 'name',
 			),
 			array(
-				'trait' => '=',
+				'trait' => ':',
 			),
 			array(
-				'build' => 'createValue',
+				'template' => 'value',
 			),
 			array(
 				'trait' => ';',

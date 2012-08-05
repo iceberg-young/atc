@@ -43,12 +43,6 @@ namespace atc\ast {
 		protected static $prefixes = array( );
 
 		/**
-		 * Inferior nodes.
-		 * @var array
-		 */
-		private $children = array( );
-
-		/**
 		 * Possible key words.
 		 * @var array
 		 */

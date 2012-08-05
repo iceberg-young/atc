@@ -8,23 +8,8 @@ namespace atc\ast\head {
 		}
 
 		protected function createOops() {
-			$this->oops = $this->createDeriver( 'part\block', array( 'part\dirty' ) );
+			return $this->createDeriver( 'part\block', array( 'part\dirty' ) );
 		}
-
-		protected function createBody() {
-			$this->body = $this->createDeriver( 'part\block', array( 'body\_call' ) );
-		}
-
-		/**
-		 * Exception parameter.
-		 * @var \atc\ast\part\expression
-		 */
-		private $oops;
-
-		/**
-		 * @var \atc\ast\part\block
-		 */
-		private $body;
 
 		/**
 		 * Override parent's.
@@ -32,12 +17,11 @@ namespace atc\ast\head {
 		 */
 		protected static $patterns = array(
 			array(
+				'template' => 'oops',
 				'trait' => '(',
-				'build' => 'createOops',
 			),
 			array(
-				'trait' => '{',
-				'build' => 'createBody',
+				'template' => 'body',
 			),
 		);
 
