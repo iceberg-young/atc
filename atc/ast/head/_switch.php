@@ -4,7 +4,7 @@ namespace atc\ast\head {
 	class _switch extends \atc\ast\head {
 
 		public function __toString() {
-			return "SWITCH ({$this->term}) {\n{$this->body}\n}" . $this->getDebugLocation();
+			return "SWITCH {$this->term} {\n{$this->body}\n}" . $this->getDebugLocation();
 		}
 
 		protected function createBody() {

@@ -4,7 +4,7 @@ namespace atc\ast\head {
 	class _if extends \atc\ast\head {
 
 		public function __toString() {
-			return "IF ({$this->term}) {\n{$this->body}\n}" . $this->getDebugLocation();
+			return "IF {$this->term} {\n{$this->body}\n}" . $this->getDebugLocation();
 		}
 
 		/**

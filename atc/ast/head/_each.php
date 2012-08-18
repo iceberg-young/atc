@@ -4,7 +4,7 @@ namespace atc\ast\head {
 	class _each extends \atc\ast\head {
 
 		public function __toString() {
-			return "EACH ({$this->term}) {\n{$this->body}\n}" . $this->getDebugLocation();
+			return "EACH {$this->term} {\n{$this->body}\n}" . $this->getDebugLocation();
 		}
 
 		/**

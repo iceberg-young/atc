@@ -4,11 +4,7 @@ namespace atc\ast\head {
 	class _catch extends \atc\ast\head {
 
 		public function __toString() {
-			return "CATCH ({$this->oops}) {\n{$this->body}\n}" . $this->getDebugLocation();
-		}
-
-		protected function createOops() {
-			return $this->createDeriver( 'part\block', array( 'part\dirty' ) );
+			return "CATCH {$this->name} OF {$this->link} {\n{$this->body}\n}" . $this->getDebugLocation();
 		}
 
 		/**
@@ -17,8 +13,13 @@ namespace atc\ast\head {
 		 */
 		protected static $patterns = array(
 			array(
-				'template' => 'oops',
-				'trait' => '(',
+				'template' => 'name',
+			),
+			array(
+				'trait' => 'of',
+			),
+			array(
+				'template' => 'link',
 			),
 			array(
 				'template' => 'body',
