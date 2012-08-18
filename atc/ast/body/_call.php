@@ -13,7 +13,6 @@ namespace atc\ast\body {
 			'include' => 7,
 			'require' => 7,
 			'alias' => 5,
-			'new' => 3,
 			'if' => 2,
 			'else' => 4,
 			'switch' => 6,

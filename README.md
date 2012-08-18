@@ -131,6 +131,8 @@ Key Words
   - `true`
   - `false`
 
+  - `this`
+
 
 Macros
 ------
@@ -138,9 +140,7 @@ Macros
 ### Fungible
 
   - `_call`
-  - `_case`
   - `_class`
-  - `_loop`
   - `_scope`
 
 
@@ -158,12 +158,13 @@ Macros
 Operators
 ---------
 
-  - `+` add, [protected]
-  - `-` subtract, [private]
+  - `+` add
+  - `-` subtract
   - `*` multiply
   - `/` divide
   - `%` integer divide with remainder, `1, 2 = 7 % 5`
 
+  - `.` member
   - `:` assign
   - `,` list separator
   - `#` comment
@@ -176,7 +177,7 @@ Operators
   - `>`; `>=`
   - `<`; `<=`
 
-  - `=` equal, [virtual]; `^=` bitwise equal
+  - `=` equal; `^=` bitwise equal
   - `!=` not equal; `^!=` bitwise not equal
 
 
@@ -208,6 +209,23 @@ Operators
   - `( )` sub expression
   - `[ ]` array indexing
   - `{ }` code block
+
+
+### Prefix
+
+  1. Access prefix. For scope, class, base, call, unit, and their alias.
+
+    - `+` protected
+    - `-` private
+
+  2. Locate prefix. For member call.
+
+    - `.` static, also for unit and local variable
+    - `*` virtual, also for base
+    - `/` final, also for class
+    - `=` override
+
+  Access prefix must before locate prefix.
 
 
 ### Not Used

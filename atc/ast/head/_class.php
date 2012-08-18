@@ -4,7 +4,7 @@ namespace atc\ast\head {
 	class _class extends \atc\ast\head {
 
 		public function __toString() {
-			return "CLASS {$this->name} {\n{$this->body}\n}" . $this->getDebugLocation();
+			return "CLASS {$this->access}{$this->final}{$this->name} {\n{$this->body}\n}" . $this->getDebugLocation();
 		}
 
 		protected function createBody() {
@@ -16,6 +16,14 @@ namespace atc\ast\head {
 		 * @var array
 		 */
 		protected static $patterns = array(
+			array(
+				'template' => 'access',
+				'optional' => true,
+			),
+			array(
+				'template' => 'final',
+				'optional' => true,
+			),
 			array(
 				'template' => 'name',
 				'optional' => true,

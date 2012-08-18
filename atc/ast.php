@@ -96,7 +96,6 @@ namespace atc {
 		protected function createDeriver( $type, array $args = array( ) ) {
 			array_push( $args, $this->builder, $this );
 			$class = new \ReflectionClass( "atc\\ast\\$type" );
-			$this->previous = $this->current;
 			$this->current = $class->newInstanceArgs( $args );
 
 			switch ( $class->getConstant( 'DERIVER_PUSH' ) ) {

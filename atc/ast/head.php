@@ -4,7 +4,7 @@ namespace atc\ast {
 	class head extends \atc\ast {
 
 		public function __get( $name ) {
-			return $this->children[$name];
+			return @$this->children[$name];
 		}
 
 		protected function filterDeriver() {
@@ -39,10 +39,15 @@ namespace atc\ast {
 						$this->children[$pattern['label']] = $this->{$pattern['build']}();
 						return \atc\ast::FILTER_COMPLETE;
 					}
-					else return \atc\ast::FILTER_TERMINAL;
+					else {
+						if ( isset( $pattern['label'] ) ) {
+							$this->children[$pattern['label']] = $this->fresh;
+						}
+						return \atc\ast::FILTER_TERMINAL;
+					}
 				}
 				elseif ( !isset( $pattern['optional'] ) ) {
-					trigger_error( "unexpected {$this->fragment}({$this->fresh})", E_USER_ERROR );
+					trigger_error( "unexpected {$this->fragment}({$this->fresh}) of $deriver", E_USER_ERROR );
 				}
 			}
 			trigger_error( "out of patterns", E_USER_ERROR );
@@ -75,7 +80,7 @@ namespace atc\ast {
 			return $this->createDeriver( 'part\string' );
 		}
 
-		const NAME_TRAIT = '#[a-z]#i';
+		const NAME_TRAIT = '#[a-z_]#i';
 
 		protected function createName() {
 			return $this->createDeriver( 'part\name', array( false ) );
@@ -100,6 +105,12 @@ namespace atc\ast {
 		protected function createTerm() {
 			return $this->createDeriver( 'part\before', array( 'part\dirty' ) );
 		}
+
+		const ACCESS_TRAIT = '#[+-]#';
+		const LOCATE_TRAIT = '#[.*/=]#';
+		const STATIC_TRAIT = '.';
+		const VIRTUAL_TRAIT = '*';
+		const FINAL_TRAIT = '/';
 
 		/**
 		 * Possible patterns.

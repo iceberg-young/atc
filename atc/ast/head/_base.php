@@ -1,10 +1,10 @@
 <?php
 namespace atc\ast\head {
 
-	class _alias extends \atc\ast\head {
+	class _base extends \atc\ast\head {
 
 		public function __toString() {
-			return "ALIAS {$this->access}{$this->name} : {$this->link};" . $this->getDebugLocation();
+			return "BASE {$this->access}{$this->virtual}{$this->link};" . $this->getDebugLocation();
 		}
 
 		/**
@@ -17,10 +17,8 @@ namespace atc\ast\head {
 				'optional' => true,
 			),
 			array(
-				'template' => 'name',
-			),
-			array(
-				'trait' => ':',
+				'template' => 'virtual',
+				'optional' => true,
 			),
 			array(
 				'template' => 'link',

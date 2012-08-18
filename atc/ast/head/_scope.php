@@ -4,7 +4,7 @@ namespace atc\ast\head {
 	class _scope extends \atc\ast\head {
 
 		public function __toString() {
-			return "SCOPE {$this->name} {\n{$this->body}\n}" . $this->getDebugLocation();
+			return "SCOPE {$this->access}{$this->name} {\n{$this->body}\n}" . $this->getDebugLocation();
 		}
 
 		protected function createBody() {
@@ -16,6 +16,10 @@ namespace atc\ast\head {
 		 * @var array
 		 */
 		protected static $patterns = array(
+			array(
+				'template' => 'access',
+				'optional' => true,
+			),
 			array(
 				'template' => 'name',
 				'optional' => true,
