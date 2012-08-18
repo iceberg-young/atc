@@ -14,8 +14,9 @@ namespace atc\ast {
 			}
 			$count = self::$pattern_amounts[$deriver];
 			while ( $count > $this->cursor ) {
-				$pattern = &static::$patterns[$this->cursor++];
+				$pattern = &static::$patterns[$this->cursor];
 				$this->completePattern( $deriver, $pattern );
+
 				if ( isset( $pattern['trait'] ) ) {
 					$trait = $pattern['trait'];
 					$length = strlen( $trait );
@@ -32,6 +33,8 @@ namespace atc\ast {
 					else return \atc\ast::FILTER_CONTINUE;
 				}
 				else $match = true;
+
+				++$this->cursor;
 
 				if ( $match ) {
 					if ( $count === $this->cursor ) $this->markEnding();
