@@ -62,7 +62,7 @@ namespace atc {
 		}
 
 		public function markLocation() {
-			$this->location = (object) array(
+			$this->location = array(
 				'path' => $this->path,
 				'row' => $this->row,
 				'column' => $this->column,

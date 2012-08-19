@@ -1,18 +1,9 @@
 <?php
 namespace atc\ast\part {
 
-	class string extends \atc\ast {
+	class string extends \atc\ast\part {
 
-		public function __construct( \atc\builder $builder, $parent = null ) {
-			parent::__construct( $builder, $parent );
-			$this->parser = 'parseType';
-		}
-
-		public function __toString() {
-			return $this->content . $this->getDebugLocation();
-		}
-
-		public function push( $c ) {
+		public function push( $c, $s ) {
 			return $this->{$this->parser}( $c );
 		}
 
@@ -28,9 +19,7 @@ namespace atc\ast\part {
 					$d = strpos( $this->content, '`' ) + 1;
 					$this->content = substr( $this->content, $d, -$d );
 				}
-				else {
-					// escaping?
-				}
+				$this->content = '"' . addslashes( $this->content ) . '"';
 				$this->parser = 'parseSuffix';
 			}
 			else $this->content .= $c;
@@ -52,25 +41,16 @@ namespace atc\ast\part {
 		private $type;
 
 		/**
-		 * Parsed content.
-		 * @var string
-		 */
-		private $content;
-
-		/**
 		 * Parsed suffix.
 		 * @var string
 		 */
 		private $suffix;
 
 		/**
-		 * Escape lookup table.
-		 * @var array
+		 * Current parser function name.
+		 * @var string
 		 */
-		private static $table = array(
-			'"' => '"',
-			'n' => "\n",
-		);
+		private $parser = 'parseType';
 
 	}
 

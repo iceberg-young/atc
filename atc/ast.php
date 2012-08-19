@@ -7,7 +7,8 @@ namespace atc {
 			$this->builder = $builder;
 			$this->parent = $parent;
 
-			$this->location = $this->builder->getLocation();
+			$this->location = (object) $this->builder->getLocation();
+			$this->location->type = get_class( $this );
 		}
 
 		public function getBuilder() {

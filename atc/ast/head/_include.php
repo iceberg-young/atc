@@ -4,7 +4,7 @@ namespace atc\ast\head {
 	class _include extends \atc\ast\head {
 
 		public function __toString() {
-			return "INCLUDE \"{$this->path}\";" . $this->getDebugLocation();
+			return "INCLUDE {$this->path};" . $this->getDebugLocation();
 		}
 
 		/**
