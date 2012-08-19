@@ -34,10 +34,9 @@ namespace atc\ast {
 				}
 				else $match = true;
 
-				++$this->cursor;
+				if ( $count === ++$this->cursor ) $this->markEnding();
 
 				if ( $match ) {
-					if ( $count === $this->cursor ) $this->markEnding();
 					if ( isset( $pattern['build'] ) ) {
 						$this->children[$pattern['label']] = $this->{$pattern['build']}();
 						return \atc\ast::FILTER_COMPLETE;
@@ -53,7 +52,7 @@ namespace atc\ast {
 					trigger_error( "unexpected {$this->fragment}({$this->fresh}) of $deriver", E_USER_ERROR );
 				}
 			}
-			trigger_error( "out of patterns", E_USER_ERROR );
+			trigger_error( "$deriver out of patterns for {$this->fragment}({$this->fresh})", E_USER_ERROR );
 		}
 
 		protected function completePattern( $deriver, &$pattern ) {
@@ -76,8 +75,6 @@ namespace atc\ast {
 				}
 			}
 		}
-
-		const PATH_TRAIT = '#[`"\']#';
 
 		protected function createPath() {
 			return $this->createDeriver( 'part\string' );
@@ -107,6 +104,10 @@ namespace atc\ast {
 
 		protected function createTerm() {
 			return $this->createDeriver( 'part\before', array( 'part\dirty' ) );
+		}
+
+		protected function createDeclare() {
+			return $this->createDeriver( 'head\_of' );
 		}
 
 		const ACCESS_TRAIT = '#[+-]#';

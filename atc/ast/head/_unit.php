@@ -4,7 +4,7 @@ namespace atc\ast\head {
 	class _unit extends \atc\ast\head {
 
 		public function __toString() {
-			return "UNIT {$this->access}{$this->static}{$this->name} OF {$this->link};" . $this->getDebugLocation();
+			return "UNIT {$this->access}{$this->static}{$this->declare};" . $this->getDebugLocation();
 		}
 
 		/**
@@ -21,13 +21,7 @@ namespace atc\ast\head {
 				'optional' => true,
 			),
 			array(
-				'template' => 'name',
-			),
-			array(
-				'trait' => 'of',
-			),
-			array(
-				'template' => 'link',
+				'template' => 'declare',
 			),
 			array(
 				'trait' => ';',

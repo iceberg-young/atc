@@ -1,10 +1,10 @@
 <?php
 namespace atc\ast\head {
 
-	class _catch extends \atc\ast\head {
+	class _of extends \atc\ast\head {
 
 		public function __toString() {
-			return "CATCH {$this->declare} {\n{$this->body}\n}" . $this->getDebugLocation();
+			return "{$this->name} OF {$this->link}" . $this->getDebugLocation();
 		}
 
 		/**
@@ -13,10 +13,13 @@ namespace atc\ast\head {
 		 */
 		protected static $patterns = array(
 			array(
-				'template' => 'declare',
+				'template' => 'name',
 			),
 			array(
-				'template' => 'body',
+				'trait' => 'of',
+			),
+			array(
+				'template' => 'link',
 			),
 		);
 

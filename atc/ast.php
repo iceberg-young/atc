@@ -141,8 +141,9 @@ namespace atc {
 				$this->current = null;
 				$this->intact = true;
 				$this->builder->clearLocation();
-				if ( self::PUSH_OVERFLOW === $status ) $status = $this->push( $this->fresh, $this->space );
-				elseif ( !$this->ending ) $status = self::PUSH_CONTINUE;
+				if ( !$this->ending ) {
+					$status = self::PUSH_OVERFLOW === $status ? $this->push( $this->fresh, $this->space ) : self::PUSH_CONTINUE;
+				}
 			}
 			return $status;
 		}
