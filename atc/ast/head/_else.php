@@ -4,7 +4,7 @@ namespace atc\ast\head {
 	class _else extends \atc\ast\head {
 
 		public function __toString() {
-			return "ELSE {\n{$this->body}\n}" . $this->getDebugLocation();
+			return "ELSE [\n{$this->body}\n]" . $this->getDebugLocation();
 		}
 
 		/**

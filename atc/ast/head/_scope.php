@@ -4,7 +4,7 @@ namespace atc\ast\head {
 	class _scope extends \atc\ast\head {
 
 		public function __toString() {
-			return "SCOPE {$this->access}{$this->name} {\n{$this->body}\n}" . $this->getDebugLocation();
+			return "SCOPE {$this->access}{$this->name} [\n{$this->body}\n]" . $this->getDebugLocation();
 		}
 
 		protected function createBody() {

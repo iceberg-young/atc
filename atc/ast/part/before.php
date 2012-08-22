@@ -9,7 +9,7 @@ namespace atc\ast\part {
 		}
 
 		public function push( $c, $s ) {
-			if ( '{' !== $c ) {
+			if ( \atc\ast\head::BODY_TRAIT !== $c ) {
 				$this->content->push( $c, $s );
 				return parent::PUSH_CONTINUE;
 			}

@@ -4,7 +4,7 @@ namespace atc\ast\head {
 	class _call extends \atc\ast\head {
 
 		public function __toString() {
-			return "CALL {$this->access}{$this->locate}{$this->name} ({$this->parameter}) {\n{$this->body}\n}" . $this->getDebugLocation();
+			return "CALL {$this->access}{$this->locate}{$this->name} ({$this->parameter}) [\n{$this->body}\n]" . $this->getDebugLocation();
 		}
 
 		protected function createParameter() {

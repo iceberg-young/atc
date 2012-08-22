@@ -4,7 +4,7 @@ namespace atc\ast\head {
 	class _alias extends \atc\ast\head {
 
 		public function __toString() {
-			return "ALIAS {$this->access}{$this->name} : {$this->link};" . $this->getDebugLocation();
+			return "ALIAS {$this->name} : {$this->link};" . $this->getDebugLocation();
 		}
 
 		/**
@@ -12,10 +12,6 @@ namespace atc\ast\head {
 		 * @var array
 		 */
 		protected static $patterns = array(
-			array(
-				'template' => 'access',
-				'optional' => true,
-			),
 			array(
 				'template' => 'name',
 			),

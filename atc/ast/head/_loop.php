@@ -4,7 +4,7 @@ namespace atc\ast\head {
 	class _loop extends \atc\ast\head {
 
 		public function __toString() {
-			return "LOOP {$this->name} {\n{$this->body}\n}" . $this->getDebugLocation();
+			return "LOOP {$this->name} [\n{$this->body}\n]" . $this->getDebugLocation();
 		}
 
 		/**

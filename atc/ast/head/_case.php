@@ -4,7 +4,11 @@ namespace atc\ast\head {
 	class _case extends \atc\ast\head {
 
 		public function __toString() {
-			return "CASE {$this->case} {\n{$this->body}\n}" . $this->getDebugLocation();
+			return "CASE {$this->case} [\n{$this->body}\n]" . $this->getDebugLocation();
+		}
+
+		protected function createCase() {
+			return $this->createDeriver( 'part\before', array( 'part\dirty' ) );
 		}
 
 		/**

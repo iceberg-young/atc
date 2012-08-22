@@ -22,13 +22,13 @@ Weird Ideas
       I.e. write distinct functions first, then put them into an alias group.
 
       ```
-      alias glColor : glColor3ub, glColor4f; # Refer OpenGL functions
+      alias glColor : {glColor3ub, glColor4f}; # Refer OpenGL functions
       ```
 
     - Template specialization.
 
       ```
-      alias template_class[specialized_arguments] : specialized_class;
+      alias template_class{specialized_arguments} : specialized_class;
       ```
 
   - Prefer less key press, especially less combination key press.
@@ -155,6 +155,20 @@ Macros
   - `_scope_`
 
 
+Build-in Method
+---------------
+
+  - `_create`
+  - `_delete`
+
+
+### Iteration
+
+  - `_head`
+  - `_tail`
+  - `_next`
+
+
 Operators
 ---------
 
@@ -200,20 +214,20 @@ Operators
   - `&:`; `^&:`
   - `|:`; `^|:`
   - `~:`; `^~:`
-  - `<<:`; `<<<:`; `^<>:`
-  - `>>:`; `>>>:`; `^><:`
+  - `<<:`; `<<<:`; `^<<:`
+  - `>>:`; `>>>:`; `^>>:`
 
 
 ### Brackets
 
-  - `( )` sub expression
-  - `[ ]` array indexing
-  - `{ }` code block
+  - `( )` call parameters, array indexing, sub expression
+  - `[ ]` code block
+  - `{ }` template parameters, array
 
 
 ### Prefix
 
-  1. Access prefix. For scope, class, base, call, unit, and their alias.
+  1. Access prefix. For scope, class, base, call, unit.
 
     - `+` protected
     - `-` private

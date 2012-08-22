@@ -4,7 +4,7 @@ namespace atc\ast\head {
 	class _try extends \atc\ast\head {
 
 		public function __toString() {
-			return "TRY {\n{$this->body}\n}" . $this->getDebugLocation();
+			return "TRY [\n{$this->body}\n]" . $this->getDebugLocation();
 		}
 
 		/**

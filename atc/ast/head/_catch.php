@@ -4,7 +4,7 @@ namespace atc\ast\head {
 	class _catch extends \atc\ast\head {
 
 		public function __toString() {
-			return "CATCH {$this->declare} {\n{$this->body}\n}" . $this->getDebugLocation();
+			return "CATCH {$this->declare} [\n{$this->body}\n]" . $this->getDebugLocation();
 		}
 
 		/**

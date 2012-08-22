@@ -92,14 +92,10 @@ namespace atc\ast {
 			return $this->createDeriver( 'part\name', array( true ) );
 		}
 
-		const BODY_TRAIT = '{';
+		const BODY_TRAIT = '[';
 
 		protected function createBody() {
 			return $this->createDeriver( 'part\block', array( 'body\_call' ) );
-		}
-
-		protected function createCase() {
-			return $this->createDeriver( 'part\before', array( 'part\dirty' ) );
 		}
 
 		protected function createTerm() {
