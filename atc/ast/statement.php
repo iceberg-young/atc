@@ -10,7 +10,7 @@ namespace atc\ast {
 		}
 
 		public function push( $c ) {
-			if ( !((';' === $c) && $this->isShallow()) ) {
+			if ( (';' !== $c) || $this->isDeep() ) {
 				$this->me .= $c;
 				return parent::PUSH_CONTINUE;
 			}

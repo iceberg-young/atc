@@ -14,7 +14,7 @@ namespace atc\ast\part {
 		}
 
 		private function parseContent( $c ) {
-			if ( !$this->isDeep() ) {
+			if ( $this->isShallow() ) {
 				if ( '`' === $this->type ) {
 					$d = strpos( $this->content, '`' ) + 1;
 					$this->content = substr( $this->content, $d, -$d );

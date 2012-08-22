@@ -6,7 +6,7 @@ namespace atc\ast\part {
 		const DERIVER_PUSH = parent::DERIVER_PUSH_PEND;
 
 		public function push( $c ) {
-			if ( !((';' === $c) && $this->isShallow()) ) {
+			if ( (';' !== $c) || $this->isDeep() ) {
 				$this->content .= $c;
 				return parent::PUSH_CONTINUE;
 			}

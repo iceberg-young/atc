@@ -11,7 +11,7 @@ namespace atc\ast\part {
 		}
 
 		public function push( $c, $s ) {
-			if ( $this->isDeep() ) {
+			if ( !$this->isShallow() ) {
 				$this->content->push( $c, $s );
 				return parent::PUSH_CONTINUE;
 			}

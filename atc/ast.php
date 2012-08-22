@@ -28,11 +28,11 @@ namespace atc {
 		}
 
 		public function isDeep() {
-			return $this->builder->getLevel() >= $this->location->level;
+			return $this->builder->getLevel() > $this->location->level;
 		}
 
 		public function isShallow() {
-			return $this->builder->getLevel() <= $this->location->level;
+			return $this->builder->getLevel() < $this->location->level;
 		}
 
 		const PUSH_CONTINUE = 'continue';
