@@ -9,6 +9,7 @@ namespace atc\ast\body {
 		 */
 		protected static $prefixes = array(
 			'case' => 4,
+			'default' => 7,
 		);
 
 	}

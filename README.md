@@ -105,6 +105,7 @@ Key Words
 
   - `case`
   - `catch`
+  - `default`
   - `each`
   - `else`
   - `if`
