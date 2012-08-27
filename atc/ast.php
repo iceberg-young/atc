@@ -94,12 +94,20 @@ namespace atc {
 		const DERIVER_PUSH_NONE = 'none';
 		const DERIVER_PUSH = self::DERIVER_PUSH_LAST;
 
-		protected function createDeriver( $type, array $args = array( ) ) {
-			array_push( $args, $this->builder, $this );
+		protected function getChildCreator( array $args ) {
+			$type = array_shift( $args );
+			array_unshift( $args, $this->builder, $this );
 			$class = new \ReflectionClass( "atc\\ast\\$type" );
-			$this->current = $class->newInstanceArgs( $args );
+			return function() use($class, $args) {
+				return $class->newInstanceArgs( $args );
+			};
+		}
 
-			switch ( $class->getConstant( 'DERIVER_PUSH' ) ) {
+		protected function appendChild() {
+			$creator = $this->getChildCreator( func_get_args() );
+			$child = $this->current = call_user_func( $creator );
+
+			switch ( $child::DERIVER_PUSH ) {
 				case self::DERIVER_PUSH_PEND:
 					foreach ( str_split( $this->fragment ) as $p ) {
 						$status = $this->current->push( $p, false );

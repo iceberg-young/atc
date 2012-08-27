@@ -5,9 +5,8 @@ namespace atc\ast\part {
 
 		const DERIVER_PUSH = parent::DERIVER_PUSH_NONE;
 
-		public function __construct( $type, \atc\builder $builder, $parent = null ) {
-			parent::__construct( $builder, $parent );
-			$this->createContent( $type );
+		public function __construct() {
+			$this->createContent( func_get_args() );
 		}
 
 		public function push( $c, $s ) {

@@ -8,7 +8,7 @@ namespace atc\ast\head {
 		}
 
 		protected function createBody() {
-			return $this->createDeriver( 'part\block', array( 'body\_class' ) );
+			return $this->appendChild( 'part\block', 'body\_class' );
 		}
 
 		/**

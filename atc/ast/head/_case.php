@@ -8,7 +8,7 @@ namespace atc\ast\head {
 		}
 
 		protected function createCase() {
-			return $this->createDeriver( 'part\before', array( 'part\dirty' ) );
+			return $this->appendChild( 'part\before', 'part\dirty' );
 		}
 
 		/**

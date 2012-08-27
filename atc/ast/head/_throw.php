@@ -8,7 +8,7 @@ namespace atc\ast\head {
 		}
 
 		protected function createOops() {
-			return $this->createDeriver( 'part\dirty' );
+			return $this->appendChild( 'part\dirty' );
 		}
 
 		/**

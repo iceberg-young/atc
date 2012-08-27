@@ -77,33 +77,33 @@ namespace atc\ast {
 		}
 
 		protected function createPath() {
-			return $this->createDeriver( 'part\string' );
+			return $this->appendChild( 'part\string' );
 		}
 
 		const NAME_TRAIT = '#[a-z_]#i';
 
 		protected function createName() {
-			return $this->createDeriver( 'part\name', array( false ) );
+			return $this->appendChild( 'part\name', false );
 		}
 
 		const LINK_TRAIT = '#[a-z_]#i';
 
 		protected function createLink() {
-			return $this->createDeriver( 'part\name', array( true ) );
+			return $this->appendChild( 'part\name', true );
 		}
 
 		const BODY_TRAIT = '[';
 
 		protected function createBody() {
-			return $this->createDeriver( 'part\block', array( 'body\_call' ) );
+			return $this->appendChild( 'part\block', 'body\_call' );
 		}
 
 		protected function createTerm() {
-			return $this->createDeriver( 'part\before', array( 'part\dirty' ) );
+			return $this->appendChild( 'part\before', 'part\dirty' );
 		}
 
 		protected function createDeclare() {
-			return $this->createDeriver( 'head\_of' );
+			return $this->appendChild( 'head\_of' );
 		}
 
 		const ACCESS_TRAIT = '#[+-]#';

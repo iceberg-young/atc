@@ -7,9 +7,12 @@ namespace atc\ast {
 			return $this->content . $this->getDebugLocation();
 		}
 
-		protected function createContent( $type ) {
-			$content = "\\atc\\ast\\$type";
-			$this->content = new $content( $this->getBuilder(), $this->getParent() );
+		protected function createContent( $args ) {
+			list($builder, $parent) = array_splice( $args, 0, 2 );
+			parent::__construct( $builder, $parent );
+			$creator = $this->getChildCreator( $args );
+			$this->content = call_user_func( $creator );
+			return $creator;
 		}
 
 		/**

@@ -26,7 +26,7 @@ namespace atc\ast {
 					unset( $this->options[$option] );
 				}
 
-				$this->children[] = $this->createDeriver( $type );
+				$this->children[] = $this->appendChild( $type );
 				$this->options = null;
 				return \atc\ast::FILTER_COMPLETE;
 			}
