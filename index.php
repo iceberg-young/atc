@@ -4,8 +4,8 @@ spl_autoload_register( function($name) {
 } );
 
 if ( isset( $argv[1] ) ) {
-	$builder = new atc\builder();
-	$builder->parse( $argv[1] );
+	$builder = new atc\builder( $argv[1] );
+	$builder->parse();
 	echo $builder->getNode();
 }
 else {

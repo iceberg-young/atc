@@ -3,7 +3,9 @@ namespace atc {
 
 	class builder {
 
-		public function parse( $path ) {
+		public function __construct( $path ) {
+			$this->log = new log( $this );
+
 			switch ( strrchr( $path, '.' ) ) {
 				case '.ate':
 					$this->node = new ast\body\_call( $this );
@@ -14,9 +16,11 @@ namespace atc {
 				default:
 					die( "I don't know how to deal with $path." );
 			}
-
-			// Source location.
 			$this->path = $path;
+		}
+
+		public function parse() {
+			// Source location.
 			$this->row = 0;
 			$this->column = -1;
 
@@ -30,7 +34,7 @@ namespace atc {
 
 			$this->setParser( self::PARSE_BRACKET );
 
-			$file = fopen( $path, 'r' );
+			$file = fopen( $this->path, 'r' );
 			while ( false !== ($c = fgetc( $file )) ) {
 				if ( "\n" === $c ) {
 					++$this->row;
@@ -58,16 +62,24 @@ namespace atc {
 		}
 
 		public function getLocation() {
-			return $this->location;
-		}
-
-		public function markLocation() {
-			$this->location = array(
+			return array(
 				'path' => $this->path,
 				'row' => $this->row,
 				'column' => $this->column,
 				'level' => $this->getLevel(),
 			);
+		}
+
+		public function markLocation() {
+			$this->location = $this->getLocation();
+		}
+
+		public function pickLocation() {
+			return $this->location;
+		}
+
+		public function log() {
+			return $this->log;
 		}
 
 		private function setParser( $parser ) {
@@ -93,7 +105,7 @@ namespace atc {
 
 				case self::PARSE_TERMINAL:
 				default:
-					trigger_error( "Unexpected parser: $parser", E_USER_ERROR );
+					$this->log->debug( "Unexpected parser ($parser)" );
 			}
 			$this->parser = $parser;
 		}
@@ -151,6 +163,12 @@ namespace atc {
 		private function trim( $c, $s ) {
 			if ( !($s && $this->space) ) $this->node->push( $c, $s );
 		}
+
+		/**
+		 * Log tool.
+		 * @var log
+		 */
+		private $log;
 
 		/**
 		 * Current parser function name.

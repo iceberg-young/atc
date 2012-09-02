@@ -7,7 +7,7 @@ namespace atc {
 			$this->parent = $parent;
 			$this->builder = $builder;
 
-			$this->location = (object) $this->builder->getLocation();
+			$this->location = (object) $this->builder->pickLocation();
 			$this->location->type = get_class( $this );
 		}
 
@@ -37,8 +37,11 @@ namespace atc {
 
 		public function push( $c, $s ) {
 			if ( isset( $this->location->done ) ) {
-				trigger_error( get_class( $this ) . ' already done', E_USER_ERROR );
+				$class = get_class( $this );
+				$this->log()->debug( "($class) doesn't want more." );
+				return self::PUSH_OVERFLOW;
 			}
+
 			$this->fresh = $c;
 			$this->space = $s;
 			if ( !$this->current ) {
@@ -53,7 +56,7 @@ namespace atc {
 					$this->filterDeriver();
 					if ( $this->filter ) {
 						if ( $this->space ) {
-							trigger_error( 'unexpected space in pending part', E_USER_ERROR );
+							$this->log()->debug( "Child must identifiable by ({$this->fragment})." );
 						}
 						$this->fragment .= $this->fresh;
 						$this->length += strlen( $this->fresh );
@@ -69,15 +72,21 @@ namespace atc {
 		}
 
 		public function done() {
-			if ( $this->filter ) {
-				trigger_error( 'incomplete child node', E_USER_WARNING );
+			if ( isset( $this->location->done ) ) {
+				$class = get_class( $this );
+				$this->log()->debug( "Completion of ($class) already notified." );
 			}
-			$this->location->done = true;
-			if ( $this->current ) {
-				$this->current->done();
-				$this->current = null;
+			else {
+				if ( $this->filter ) {
+					$this->log()->error( "Has unidentified child ({$this->fragment})." );
+				}
+				$this->location->done = true;
+				if ( $this->current ) {
+					$this->current->done();
+					$this->current = null;
+				}
+				$this->fragment = null;
 			}
-			$this->fragment = null;
 		}
 
 		public function comment( $blank ) {
@@ -124,11 +133,15 @@ namespace atc {
 		}
 
 		protected function filterDeriver() {
-			trigger_error( __METHOD__ . ' must be overrided!', E_USER_ERROR );
+			$this->log()->debug( __METHOD__ . ' must be overrided!' );
 		}
 
 		protected function getDebugLocation() {
 			return "\t#" . json_encode( $this->location ) . "\n";
+		}
+
+		protected function log() {
+			return $this->builder->log();
 		}
 
 		private function transfer() {
