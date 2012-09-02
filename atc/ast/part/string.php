@@ -31,7 +31,10 @@ namespace atc\ast\part {
 				$this->suffix .= $c;
 				return parent::PUSH_CONTINUE;
 			}
-			else return parent::PUSH_OVERFLOW;
+			else {
+				$this->done();
+				return parent::PUSH_OVERFLOW;
+			}
 		}
 
 		/**

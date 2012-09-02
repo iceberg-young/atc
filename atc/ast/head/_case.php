@@ -4,11 +4,7 @@ namespace atc\ast\head {
 	class _case extends \atc\ast\head {
 
 		public function __toString() {
-			return "CASE {$this->case} [\n{$this->body}\n]" . $this->getDebugLocation();
-		}
-
-		protected function createCase() {
-			return $this->appendChild( 'part\before', 'part\dirty' );
+			return "CASE {$this->term} [\n{$this->body}\n]" . $this->getDebugLocation();
 		}
 
 		/**
@@ -17,7 +13,7 @@ namespace atc\ast\head {
 		 */
 		protected static $patterns = array(
 			array(
-				'template' => 'case',
+				'template' => 'term',
 			),
 			array(
 				'template' => 'body',

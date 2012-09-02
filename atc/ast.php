@@ -4,11 +4,15 @@ namespace atc {
 	abstract class ast {
 
 		public function __construct( builder $builder, $parent = null ) {
-			$this->builder = $builder;
 			$this->parent = $parent;
+			$this->builder = $builder;
 
 			$this->location = (object) $this->builder->getLocation();
 			$this->location->type = get_class( $this );
+		}
+
+		public function getParent() {
+			return $this->parent;
 		}
 
 		public function getBuilder() {
@@ -17,14 +21,6 @@ namespace atc {
 
 		public function getLocation() {
 			return $this->location;
-		}
-
-		public function getParent() {
-			return $this->parent;
-		}
-
-		public function isIntact() {
-			return $this->intact;
 		}
 
 		public function isDeep() {
@@ -40,39 +36,48 @@ namespace atc {
 		const PUSH_OVERFLOW = 'overflow';
 
 		public function push( $c, $s ) {
+			if ( isset( $this->location->done ) ) {
+				trigger_error( get_class( $this ) . ' already done', E_USER_ERROR );
+			}
 			$this->fresh = $c;
 			$this->space = $s;
 			if ( !$this->current ) {
 				$status = self::PUSH_CONTINUE;
-				if ( $this->intact && !$this->space ) {
+				if ( !($this->filter || $this->space) ) {
 					$this->builder->markLocation();
-					$this->intact = false;
 					$this->fragment = '';
 					$this->length = 0;
+					$this->filter = true;
 				}
-				if ( !$this->intact ) {
-					switch ( $this->filterDeriver() ) {
-						case self::FILTER_CONTINUE:
-							if ( $this->space ) trigger_error( "unexpected space in pending part.", E_USER_ERROR );
-							$this->fragment .= $this->fresh;
-							$this->length += strlen( $this->fresh );
-							break;
-
-						case self::FILTER_TERMINAL:
-							if ( $this->ending ) {
-								$status = self::PUSH_COMPLETE;
-							} // goto FILTER_COMPLETE
-
-						case self::FILTER_COMPLETE:
-							$this->intact = true;
-							$this->fragment = '';
-							$this->length = 0;
-							break;
+				if ( $this->filter ) {
+					$this->filterDeriver();
+					if ( $this->filter ) {
+						if ( $this->space ) {
+							trigger_error( 'unexpected space in pending part', E_USER_ERROR );
+						}
+						$this->fragment .= $this->fresh;
+						$this->length += strlen( $this->fresh );
+					}
+					elseif ( $this->ending && !$this->current ) {
+						$status = self::PUSH_COMPLETE;
+						$this->done();
 					}
 				}
 			}
 			else $status = $this->transfer();
 			return $status;
+		}
+
+		public function done() {
+			if ( $this->filter ) {
+				trigger_error( 'incomplete child node', E_USER_WARNING );
+			}
+			$this->location->done = true;
+			if ( $this->current ) {
+				$this->current->done();
+				$this->current = null;
+			}
+			$this->fragment = null;
 		}
 
 		public function comment( $blank ) {
@@ -89,11 +94,6 @@ namespace atc {
 			return $comment;
 		}
 
-		const DERIVER_PUSH_PEND = 'pend';
-		const DERIVER_PUSH_LAST = 'last';
-		const DERIVER_PUSH_NONE = 'none';
-		const DERIVER_PUSH = self::DERIVER_PUSH_LAST;
-
 		protected function getChildCreator( array $args ) {
 			$type = array_shift( $args );
 			array_unshift( $args, $this->builder, $this );
@@ -103,44 +103,32 @@ namespace atc {
 			};
 		}
 
-		protected function appendChild() {
-			$creator = $this->getChildCreator( func_get_args() );
-			$child = $this->current = call_user_func( $creator );
+		const DERIVER_PUSH_PEND = 'pend';
+		const DERIVER_PUSH_LAST = 'last';
+		const DERIVER_PUSH_NONE = 'none';
+		const DERIVER_PUSH = self::DERIVER_PUSH_LAST;
 
+		protected function appendChild() {
+			$child = $this->current = call_user_func( $this->getChildCreator( func_get_args() ) );
 			switch ( $child::DERIVER_PUSH ) {
 				case self::DERIVER_PUSH_PEND:
 					foreach ( str_split( $this->fragment ) as $p ) {
-						$status = $this->current->push( $p, false );
-						if ( ast::PUSH_CONTINUE !== $status ) {
-							trigger_error( "cannot back off ($type) when create deriver", E_USER_WARNING );
-						}
+						$child->push( $p, false );
 					} // goto DERIVER_PUSH_LAST
 
 				case self::DERIVER_PUSH_LAST:
-					$status = $this->current->push( $this->fresh, $this->space );
-					if ( ast::PUSH_OVERFLOW === $status ) {
-						trigger_error( "cannot back off ($type) when create deriver", E_USER_WARNING );
-					}
+					$this->transfer();
 					break;
 			}
-
-			return $this->current;
+			return $child;
 		}
-
-		const FILTER_CONTINUE = 'continue';
-		const FILTER_COMPLETE = 'complete';
-		const FILTER_TERMINAL = 'terminal';
 
 		protected function filterDeriver() {
 			trigger_error( __METHOD__ . ' must be overrided!', E_USER_ERROR );
 		}
 
 		protected function getDebugLocation() {
-			return "\t#" . json_encode( $this->getLocation() ) . "\n";
-		}
-
-		protected function markEnding() {
-			$this->ending = true;
+			return "\t#" . json_encode( $this->location ) . "\n";
 		}
 
 		private function transfer() {
@@ -148,20 +136,13 @@ namespace atc {
 			if ( self::PUSH_CONTINUE !== $status ) {
 				$this->previous = $this->current;
 				$this->current = null;
-				$this->intact = true;
-				$this->builder->clearLocation();
 				if ( !$this->ending ) {
 					$status = self::PUSH_OVERFLOW === $status ? $this->push( $this->fresh, $this->space ) : self::PUSH_CONTINUE;
 				}
+				else $this->done();
 			}
 			return $status;
 		}
-
-		/**
-		 * Pushed part during deriver filtering.
-		 * @var string
-		 */
-		protected $fragment;
 
 		/**
 		 * Newly pushed literal.
@@ -176,10 +157,28 @@ namespace atc {
 		protected $space;
 
 		/**
+		 * Pushed part during deriver filtering.
+		 * @var string
+		 */
+		protected $fragment = '';
+
+		/**
 		 * Length of $fragment.
 		 * @var number
 		 */
-		protected $length;
+		protected $length = 0;
+
+		/**
+		 * Is identifying node?
+		 * @var boolean
+		 */
+		protected $filter = false;
+
+		/**
+		 * Is the last node?
+		 * @var boolean
+		 */
+		protected $ending = false;
 
 		/**
 		 * Inferior nodes.
@@ -200,6 +199,12 @@ namespace atc {
 		private $previous;
 
 		/**
+		 * Superior node.
+		 * @var \atc\ast
+		 */
+		private $parent;
+
+		/**
 		 * Current builder.
 		 * @var \atc\misc\builder
 		 */
@@ -210,24 +215,6 @@ namespace atc {
 		 * @var object
 		 */
 		private $location;
-
-		/**
-		 * Superior node.
-		 * @var \atc\ast
-		 */
-		private $parent;
-
-		/**
-		 * Is constructing node?
-		 * @var boolean
-		 */
-		private $intact = true;
-
-		/**
-		 * Is the last node?
-		 * @var boolean
-		 */
-		private $ending = false;
 
 		/**
 		 * Comments.

@@ -30,23 +30,21 @@ namespace atc\ast {
 					elseif ( $this->length === $length ) {
 						$match = preg_match( '/\W/', $this->fresh ) && ($pattern['trait'] === $this->fragment);
 					}
-					else return \atc\ast::FILTER_CONTINUE;
+					else return;
 				}
 				else $match = true;
 
-				if ( $count === ++$this->cursor ) $this->markEnding();
+				if ( $count === ++$this->cursor ) $this->ending = true;
 
 				if ( $match ) {
+					$this->filter = false;
 					if ( isset( $pattern['build'] ) ) {
 						$this->children[$pattern['label']] = $this->{$pattern['build']}();
-						return \atc\ast::FILTER_COMPLETE;
 					}
-					else {
-						if ( isset( $pattern['label'] ) ) {
-							$this->children[$pattern['label']] = $this->fresh;
-						}
-						return \atc\ast::FILTER_TERMINAL;
+					elseif ( isset( $pattern['label'] ) ) {
+						$this->children[$pattern['label']] = $this->fresh;
 					}
+					return;
 				}
 				elseif ( !isset( $pattern['optional'] ) ) {
 					trigger_error( "unexpected {$this->fragment}({$this->fresh}) of $deriver", E_USER_ERROR );

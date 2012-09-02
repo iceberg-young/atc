@@ -13,7 +13,10 @@ namespace atc\ast\part {
 				$this->content .= $c;
 				return parent::PUSH_CONTINUE;
 			}
-			else return parent::PUSH_OVERFLOW;
+			else {
+				$this->done();
+				return parent::PUSH_OVERFLOW;
+			}
 		}
 
 		/**

@@ -3,9 +3,9 @@ namespace atc\ast\part {
 
 	class series extends \atc\ast\part {
 
-		public function __construct() {
-			$this->creator = $this->createContent( func_get_args() );
-			$this->children[] = $this->content;
+		public function __construct( \atc\builder $builder, $parent = null ) {
+			parent::__construct( $builder, $parent );
+			$this->creator = $this->getChildCreator( array_slice( func_get_args(), 2 ) );
 		}
 
 		public function __toString() {
@@ -13,21 +13,56 @@ namespace atc\ast\part {
 		}
 
 		public function push( $c, $s ) {
+			$status = parent::PUSH_CONTINUE;
 			if ( (',' !== $c) || $this->isDeep() ) {
-				if ( !($this->content || $s) ) return parent::PUSH_OVERFLOW;
-				switch ( $this->content->push( $c, $s ) ) {
-					case parent::PUSH_COMPLETE:
-						$this->content = null;
-						break;
-					case parent::PUSH_OVERFLOW:
-						return parent::PUSH_OVERFLOW;
+				if ( $this->content ) {
+					switch ( $this->content->push( $c, $s ) ) {
+						case parent::PUSH_OVERFLOW:
+							$status = parent::PUSH_OVERFLOW;
+							parent::done();
+						case parent::PUSH_COMPLETE:
+							$this->children[] = $this->content;
+							$this->content = null;
+							break;
+					}
+				}
+				elseif ( !$s ) {
+					if ( $this->accept ) {
+						$this->accept = false;
+						$this->content = call_user_func( $this->creator );
+						return $this->push( $c, $s );
+					}
+					else {
+						$status = parent::PUSH_OVERFLOW;
+						parent::done();
+					}
 				}
 			}
 			else {
-				$this->children[] = $this->content = call_user_func( $this->creator );
+				$this->accept = true;
+				$this->appendLast();
 			}
-			return parent::PUSH_CONTINUE;
+			return $status;
 		}
+
+		public function done() {
+			parent::done();
+			$this->appendLast();
+		}
+
+		private function appendLast() {
+			if ( $this->content ) {
+				$this->content->done();
+				$this->children[] = $this->content;
+				$this->content = null;
+			}
+		}
+
+		/**
+		 * Can accept more nodes.
+		 * @var boolean
+		 */
+		private $accept = true;
 
 		/**
 		 * Children creator.

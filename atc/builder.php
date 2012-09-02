@@ -70,10 +70,6 @@ namespace atc {
 			);
 		}
 
-		public function clearLocation() {
-			$this->location = null;
-		}
-
 		private function setParser( $parser ) {
 			switch ( $parser ) {
 				case self::PARSE_BRACKET:

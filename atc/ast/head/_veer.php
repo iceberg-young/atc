@@ -7,6 +7,10 @@ namespace atc\ast\head {
 			return "VEER {$this->term};" . $this->getDebugLocation();
 		}
 
+		protected function createTerm() {
+			return $this->appendChild( 'part\dirty' );
+		}
+
 		/**
 		 * Override parent's.
 		 * @var array

@@ -3,8 +3,9 @@ namespace atc\ast\part {
 
 	class before extends \atc\ast\part {
 
-		public function __construct() {
-			$this->createContent( func_get_args() );
+		public function __construct( \atc\builder $builder, $parent = null ) {
+			parent::__construct( $builder, $parent );
+			$this->content = call_user_func( $this->getChildCreator( array_slice( func_get_args(), 2 ) ) );
 		}
 
 		public function push( $c, $s ) {
@@ -12,7 +13,10 @@ namespace atc\ast\part {
 				$this->content->push( $c, $s );
 				return parent::PUSH_CONTINUE;
 			}
-			else return parent::PUSH_OVERFLOW;
+			else {
+				$this->done();
+				return parent::PUSH_OVERFLOW;
+			}
 		}
 
 	}

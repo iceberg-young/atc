@@ -14,25 +14,22 @@ namespace atc\ast {
 				$type = static::FALLBACK;
 				$more = preg_match( '/\w/', $this->fresh );
 				foreach ( $this->options as $option => $length ) {
-					if (!$more) {
-						if ($this->fragment === $option) {
+					if ( !$more ) {
+						if ( $this->fragment === $option ) {
 							$type = "head\\_$option";
 							break;
 						}
 					}
-					elseif ( ($this->length < $length) && (substr( $option, 0, $this->length ) === $this->fragment) ) {
-						return \atc\ast::FILTER_CONTINUE;
-					}
+					elseif ( ($this->length < $length) && (substr( $option, 0, $this->length ) === $this->fragment) ) return;
 					unset( $this->options[$option] );
 				}
 
-				$this->children[] = $this->appendChild( $type );
+				$this->filter = false;
 				$this->options = null;
-				return \atc\ast::FILTER_COMPLETE;
+				$this->children[] = $this->appendChild( $type );
 			}
 			else {
 				$this->options = static::$prefixes;
-				return \atc\ast::FILTER_CONTINUE;
 			}
 		}
 
