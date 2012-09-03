@@ -4,7 +4,7 @@ namespace atc {
 	class builder {
 
 		public function __construct( $path ) {
-			$this->log = new log( $this );
+			$this->log = new log( $this, __CLASS__ );
 
 			switch ( strrchr( $path, '.' ) ) {
 				case '.ate':
@@ -76,10 +76,6 @@ namespace atc {
 
 		public function pickLocation() {
 			return $this->location;
-		}
-
-		public function log() {
-			return $this->log;
 		}
 
 		private function setParser( $parser ) {

@@ -9,6 +9,8 @@ namespace atc {
 
 			$this->location = (object) $this->builder->pickLocation();
 			$this->location->type = get_class( $this );
+
+			$this->log = new log( $this->builder, get_class( $this ) );
 		}
 
 		public function getParent() {
@@ -37,8 +39,7 @@ namespace atc {
 
 		public function push( $c, $s ) {
 			if ( isset( $this->location->done ) ) {
-				$class = get_class( $this );
-				$this->log()->debug( "($class) doesn't want more." );
+				$this->log()->debug( "Pushing ($c) to a complete node." );
 				return self::PUSH_OVERFLOW;
 			}
 
@@ -73,20 +74,17 @@ namespace atc {
 
 		public function done() {
 			if ( isset( $this->location->done ) ) {
-				$class = get_class( $this );
-				$this->log()->debug( "Completion of ($class) already notified." );
+				return $this->log()->debug( 'Completion already notified.' );
 			}
-			else {
-				if ( $this->filter ) {
-					$this->log()->error( "Has unidentified child ({$this->fragment})." );
-				}
-				$this->location->done = true;
-				if ( $this->current ) {
-					$this->current->done();
-					$this->current = null;
-				}
-				$this->fragment = null;
+			if ( $this->filter ) {
+				$this->log()->error( "Has unidentified content ({$this->fragment})." );
 			}
+			$this->location->done = true;
+			if ( $this->current ) {
+				$this->current->done();
+				$this->current = null;
+			}
+			$this->fragment = null;
 		}
 
 		public function comment( $blank ) {
@@ -133,7 +131,7 @@ namespace atc {
 		}
 
 		protected function filterDeriver() {
-			$this->log()->debug( __METHOD__ . ' must be overrided!' );
+			$this->log()->debug( __METHOD__ . ' must be overrided.' );
 		}
 
 		protected function getDebugLocation() {
@@ -141,7 +139,7 @@ namespace atc {
 		}
 
 		protected function log() {
-			return $this->builder->log();
+			return $this->log;
 		}
 
 		private function transfer() {
@@ -228,6 +226,12 @@ namespace atc {
 		 * @var object
 		 */
 		private $location;
+
+		/**
+		 * Log tool.
+		 * @var type
+		 */
+		private $log;
 
 		/**
 		 * Comments.

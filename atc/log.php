@@ -9,8 +9,9 @@ namespace atc {
 		const NOTICE = 3;
 		const INFO = 4;
 
-		public function __construct( builder $builder ) {
+		public function __construct( builder $builder, $source = null ) {
 			$this->builder = $builder;
+			$this->source = $source;
 		}
 
 		public function __call( $name, $arguments ) {
@@ -19,7 +20,7 @@ namespace atc {
 			if ( defined( $level ) && constant( $level ) <= $this->level ) {
 				$location = json_encode( $this->builder->getLocation() );
 				$message = array_shift( $arguments );
-				error_log( "[$label] $location: $message" );
+				error_log( "[$label] {$this->source} $location: $message" );
 			}
 		}
 
@@ -33,6 +34,11 @@ namespace atc {
 		 * @var atc\builder
 		 */
 		private $builder;
+
+		/**
+		 * @var string
+		 */
+		private $source;
 
 	}
 

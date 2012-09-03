@@ -34,7 +34,7 @@ namespace atc\ast {
 				}
 				else $match = true;
 
-				if ( $count === ++$this->cursor ) $this->ending = true;
+				if ( ++$this->cursor >= $count ) $this->ending = true;
 
 				if ( $match ) {
 					$this->filter = false;
@@ -47,10 +47,13 @@ namespace atc\ast {
 					return;
 				}
 				elseif ( !isset( $pattern['optional'] ) ) {
-					trigger_error( "unexpected {$this->fragment}({$this->fresh}) of $deriver", E_USER_ERROR );
+					$this->log()->error( "Unexpected ({$this->fragment}[{$this->fresh}])." );
+					$this->log()->error( 'Expecting:' . $this->getExpectations() );
+					die();
 				}
 			}
-			trigger_error( "$deriver out of patterns for {$this->fragment}({$this->fresh})", E_USER_ERROR );
+			$this->log()->error( "Out of pattern to identify ({$this->fragment}[{$this->fresh}])." );
+			die();
 		}
 
 		protected function completePattern( $deriver, &$pattern ) {
@@ -109,6 +112,19 @@ namespace atc\ast {
 		const STATIC_TRAIT = '.';
 		const VIRTUAL_TRAIT = '*';
 		const FINAL_TRAIT = '/';
+
+		private function getExpectations( $separator = "\n - " ) {
+			$entries = array( );
+			$cursor = $this->cursor;
+			$first = true;
+			while ( --$cursor >= 0 ) {
+				$pattern = &static::$patterns[$cursor];
+				if ( !($first || isset( $pattern['optional'] )) ) break;
+				array_unshift( $entries, @"{$pattern['label']}:{$pattern['trait']}" );
+				$first = false;
+			}
+			return $separator . implode( $separator, $entries );
+		}
 
 		/**
 		 * Possible patterns.
