@@ -7,13 +7,17 @@ namespace atc\ast {
 			return @$this->children[$name];
 		}
 
-		protected function filterDeriver() {
-			$deriver = get_called_class();
-			if ( !isset( self::$pattern_amounts[$deriver] ) ) {
-				self::$pattern_amounts[$deriver] = count( static::$patterns );
+		public function done() {
+			if ( isset( static::$patterns[$this->cursor] ) ) {
+				$this->log()->error( 'Incomplete node. Expecting: ' . self::getExpectations( $this->cursor, count( static::$patterns ) ) );
 			}
-			$count = self::$pattern_amounts[$deriver];
-			while ( $count > $this->cursor ) {
+			parent::done();
+		}
+
+		protected function filterDeriver() {
+			$begin = $this->cursor;
+			$deriver = get_called_class();
+			while ( isset( static::$patterns[$this->cursor] ) ) {
 				$pattern = &static::$patterns[$this->cursor];
 				$this->completePattern( $deriver, $pattern );
 
@@ -34,7 +38,7 @@ namespace atc\ast {
 				}
 				else $match = true;
 
-				if ( ++$this->cursor >= $count ) $this->ending = true;
+				if ( !isset( static::$patterns[++$this->cursor] ) ) $this->ending = true;
 
 				if ( $match ) {
 					$this->filter = false;
@@ -47,13 +51,10 @@ namespace atc\ast {
 					return;
 				}
 				elseif ( !isset( $pattern['optional'] ) ) {
-					$this->log()->error( "Unexpected ({$this->fragment}[{$this->fresh}])." );
-					$this->log()->error( 'Expecting:' . $this->getExpectations() );
-					die();
+					die( $this->log()->error( "Unexpected ({$this->fragment}[{$this->fresh}]). Expecting: " . self::getExpectations( $begin, $this->cursor ) ) );
 				}
 			}
-			$this->log()->error( "Out of pattern to identify ({$this->fragment}[{$this->fresh}])." );
-			die();
+			die( $this->log()->error( "Out of pattern to identify ({$this->fragment}[{$this->fresh}])." ) );
 		}
 
 		protected function completePattern( $deriver, &$pattern ) {
@@ -113,17 +114,12 @@ namespace atc\ast {
 		const VIRTUAL_TRAIT = '*';
 		const FINAL_TRAIT = '/';
 
-		private function getExpectations( $separator = "\n - " ) {
-			$entries = array( );
-			$cursor = $this->cursor;
-			$first = true;
-			while ( --$cursor >= 0 ) {
-				$pattern = &static::$patterns[$cursor];
-				if ( !($first || isset( $pattern['optional'] )) ) break;
-				array_unshift( $entries, @"{$pattern['label']}:{$pattern['trait']}" );
-				$first = false;
-			}
-			return $separator . implode( $separator, $entries );
+		private static function getExpectations( $begin, $end ) {
+			do {
+				$pattern = &static::$patterns[$begin];
+				$entries[] = @"{$pattern['label']} ({$pattern['trait']})";
+			} while ( ++$begin < $end );
+			return implode( ', ', $entries );
 		}
 
 		/**
@@ -131,12 +127,6 @@ namespace atc\ast {
 		 * @var array
 		 */
 		protected static $patterns = array( );
-
-		/**
-		 * Amount of patterns.
-		 * @var array
-		 */
-		private static $pattern_amounts = array( );
 
 		/**
 		 * Index of current pattern.

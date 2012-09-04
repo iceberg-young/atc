@@ -8,10 +8,10 @@ namespace atc\ast {
 		}
 
 		public function done() {
-			parent::done();
 			if ( $this->content && is_a( $this->content, 'atc\ast' ) ) {
 				$this->content->done();
 			}
+			parent::done();
 		}
 
 		/**

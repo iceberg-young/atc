@@ -46,8 +46,8 @@ namespace atc\ast\part {
 		}
 
 		public function done() {
-			parent::done();
 			$this->appendLast();
+			parent::done();
 		}
 
 		private function appendLast() {
