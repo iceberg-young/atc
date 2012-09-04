@@ -3,7 +3,7 @@ namespace atc\ast\body {
 
 	class _call extends \atc\ast\body {
 
-		const FALLBACK = 'statement';
+		const FALLBACK = 'head\statement';
 
 		/**
 		 * Override parent.
