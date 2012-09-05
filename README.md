@@ -116,8 +116,8 @@ Key Words
 
 ### Preposition
 
+  - `as`
   - `in`
-  - `of`
 
 
 ### Reference
@@ -141,6 +141,7 @@ Macros
 ### Fungible
 
   - `_call`
+  - `_case`
   - `_class`
   - `_scope`
 

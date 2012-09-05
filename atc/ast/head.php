@@ -105,7 +105,7 @@ namespace atc\ast {
 		}
 
 		protected function createDeclare() {
-			return $this->appendChild( 'head\_of' );
+			return $this->appendChild( 'head\_as' );
 		}
 
 		const ACCESS_TRAIT = '#[+-]#';

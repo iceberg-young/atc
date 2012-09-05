@@ -1,10 +1,10 @@
 <?php
 namespace atc\ast\head {
 
-	class _of extends \atc\ast\head {
+	class _as extends \atc\ast\head {
 
 		public function __toString() {
-			return "{$this->name} OF {$this->link}" . $this->getDebugLocation();
+			return "{$this->name} AS {$this->link}" . $this->getDebugLocation();
 		}
 
 		/**
@@ -16,7 +16,7 @@ namespace atc\ast\head {
 				'template' => 'name',
 			),
 			array(
-				'trait' => 'of',
+				'trait' => 'as',
 			),
 			array(
 				'template' => 'link',

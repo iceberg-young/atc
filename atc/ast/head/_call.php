@@ -8,7 +8,7 @@ namespace atc\ast\head {
 		}
 
 		protected function createParameter() {
-			return $this->appendChild( 'part\block', 'part\series', 'head\_of' );
+			return $this->appendChild( 'part\block', 'part\series', 'head\_as' );
 		}
 
 		/**
