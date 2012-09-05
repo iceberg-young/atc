@@ -243,6 +243,11 @@ Operators
 
   Access prefix must before locate prefix.
 
+  3. Function parameter prefix.
+
+    - `+` in & out
+    - `-` out
+
 
 ### Not Used
 

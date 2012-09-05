@@ -1,16 +1,10 @@
 <?php
-namespace atc\ast\head {
+namespace atc\ast\head\_as {
 
-	class _as extends \atc\ast\head {
+	class _template extends \atc\ast\head\_as {
 
 		public function __toString() {
-			return "{$this->name} AS {$this->link}" . $this->getDebugLocation();
-		}
-
-		const INIT_TRAIT = '(';
-
-		protected function createInit() {
-			return $this->appendChild( 'part\block', 'part\dirty' );
+			return "{$this->name} AS {$this->link}({$this->init})" . $this->getDebugLocation();
 		}
 
 		/**
@@ -26,6 +20,10 @@ namespace atc\ast\head {
 			),
 			array(
 				'template' => 'link',
+			),
+			array(
+				'template' => 'init',
+				'optional' => true,
 			),
 		);
 

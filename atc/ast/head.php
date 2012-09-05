@@ -116,6 +116,12 @@ namespace atc\ast {
 			return $this->appendChild( 'head\_as' );
 		}
 
+		const TEMPLATE_TRAIT = '{';
+
+		protected function createTemplate() {
+			return $this->appendChild( 'part\block', 'part\series', 'head\_as\_template' );
+		}
+
 		const ACCESS_TRAIT = '#[+-]#';
 		const LOCATE_TRAIT = '#[.*/=]#';
 		const STATIC_TRAIT = '.';

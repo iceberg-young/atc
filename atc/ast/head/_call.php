@@ -4,11 +4,11 @@ namespace atc\ast\head {
 	class _call extends \atc\ast\head {
 
 		public function __toString() {
-			return "CALL {$this->access}{$this->locate}{$this->name} ({$this->parameter}) [\n{$this->body}\n]" . $this->getDebugLocation();
+			return "CALL {$this->access}{$this->locate}{$this->name} {{$this->template}} ({$this->parameter}) [\n{$this->body}\n]" . $this->getDebugLocation();
 		}
 
 		protected function createParameter() {
-			return $this->appendChild( 'part\block', 'part\series', 'head\_as' );
+			return $this->appendChild( 'part\block', 'part\series', 'head\_as\_function' );
 		}
 
 		/**
@@ -26,6 +26,10 @@ namespace atc\ast\head {
 			),
 			array(
 				'template' => 'name',
+			),
+			array(
+				'template' => 'template',
+				'optional' => true,
 			),
 			array(
 				'trait' => '(',
