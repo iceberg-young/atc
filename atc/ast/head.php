@@ -8,8 +8,13 @@ namespace atc\ast {
 		}
 
 		public function done() {
-			if ( isset( static::$patterns[$this->cursor] ) ) {
-				$this->log()->error( 'Incomplete node. Expecting: ' . self::getExpectations( $this->cursor, count( static::$patterns ) ) );
+			$cursor = $this->cursor;
+			while ( isset( static::$patterns[$cursor] ) ) {
+				if ( !isset( static::$patterns[$cursor++]['optional'] ) ) {
+					$expectations = self::getExpectations( $this->cursor, count( static::$patterns ) );
+					$this->log()->error( "Incomplete node. Expecting: $expectations." );
+					break;
+				}
 			}
 			parent::done();
 		}
@@ -51,10 +56,13 @@ namespace atc\ast {
 					return;
 				}
 				elseif ( !isset( $pattern['optional'] ) ) {
-					die( $this->log()->error( "Unexpected ({$this->fragment}[{$this->fresh}]). Expecting: " . self::getExpectations( $begin, $this->cursor ) ) );
+					$fragment = $this->getFragmentLog();
+					$expectations = self::getExpectations( $begin, $this->cursor );
+					die( $this->log()->error( "Unexpected $fragment. Expecting: $expectations." ) );
 				}
 			}
-			die( $this->log()->error( "Out of pattern to identify ({$this->fragment}[{$this->fresh}])." ) );
+			$fragment = $this->getFragmentLog();
+			die( $this->log()->error( "Out of pattern to identify $fragment." ) );
 		}
 
 		protected function completePattern( $deriver, &$pattern ) {

@@ -24,7 +24,8 @@ namespace atc\ast {
 				}
 				if ( !isset( $type ) ) {
 					if ( !static::FALLBACK ) {
-						$this->log()->error( "({$this->fragment}[{$this->fresh}]) isn't an option of child node." );
+						$fragment = $this->getFragmentLog();
+						$this->log()->error( "$fragment isn't an option of child node." );
 						die();
 					}
 					$type = static::FALLBACK;

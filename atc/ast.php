@@ -57,7 +57,8 @@ namespace atc {
 					$this->filterDeriver();
 					if ( $this->filter ) {
 						if ( $this->space ) {
-							$this->log()->debug( "Child node must be identified from ({$this->fragment})." );
+							$fragment = $this->getFragmentLog();
+							$this->log()->debug( "Child node must be identified from $fragment." );
 						}
 						$this->fragment .= $this->fresh;
 						$this->length += strlen( $this->fresh );
@@ -77,7 +78,8 @@ namespace atc {
 				return $this->log()->debug( 'Completion has already been notified.' );
 			}
 			if ( $this->filter ) {
-				$this->log()->error( "Has unidentified content ({$this->fragment})." );
+				$fragment = $this->getFragmentLog();
+				$this->log()->error( "Has unidentified content $fragment." );
 			}
 			$this->location->done = true;
 			if ( $this->current ) {
@@ -140,6 +142,10 @@ namespace atc {
 
 		protected function log() {
 			return $this->log;
+		}
+
+		protected function getFragmentLog() {
+			return "({$this->fragment}[{$this->fresh}])";
 		}
 
 		private function transfer() {
