@@ -8,15 +8,8 @@ namespace atc\ast\part {
 			$this->rule = $global ? '#[\[\w\.\]]#' : '#\w#';
 		}
 
-		public function push( $c, $s ) {
-			if ( preg_match( $this->rule, $c ) ) {
-				$this->content .= $c;
-				return parent::PUSH_CONTINUE;
-			}
-			else {
-				$this->done();
-				return parent::PUSH_OVERFLOW;
-			}
+		public function pushCondition() {
+			return preg_match( $this->rule, $this->fresh );
 		}
 
 		/**

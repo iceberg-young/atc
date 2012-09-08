@@ -7,19 +7,19 @@ namespace atc\ast {
 			return @$this->children[$name];
 		}
 
-		public function done() {
+		public function onComplete() {
+			parent::onComplete();
 			$cursor = $this->cursor;
 			while ( isset( static::$patterns[$cursor] ) ) {
 				if ( !isset( static::$patterns[$cursor++]['optional'] ) ) {
 					$expectations = self::getExpectations( $this->cursor, count( static::$patterns ) );
-					$this->log()->error( "Incomplete node. Expecting: $expectations." );
+					$this->log->error( "Incomplete node. Expecting: $expectations." );
 					break;
 				}
 			}
-			parent::done();
 		}
 
-		protected function filterDeriver() {
+		protected function onFilter() {
 			$begin = $this->cursor;
 			$deriver = get_called_class();
 			while ( isset( static::$patterns[$this->cursor] ) ) {
@@ -58,11 +58,11 @@ namespace atc\ast {
 				elseif ( !isset( $pattern['optional'] ) ) {
 					$fragment = $this->getFragmentLog();
 					$expectations = self::getExpectations( $begin, $this->cursor );
-					die( $this->log()->error( "Unexpected $fragment. Expecting: $expectations." ) );
+					die( $this->log->error( "Unexpected $fragment. Expecting: $expectations." ) );
 				}
 			}
 			$fragment = $this->getFragmentLog();
-			die( $this->log()->error( "Out of pattern to identify $fragment." ) );
+			die( $this->log->error( "Out of pattern to identify $fragment." ) );
 		}
 
 		protected function completePattern( $deriver, &$pattern ) {
@@ -70,19 +70,13 @@ namespace atc\ast {
 				$name = $pattern['template'];
 				if ( !isset( $pattern['trait'] ) ) {
 					$trait = $deriver . '::' . strtoupper( $name ) . '_TRAIT';
-					if ( defined( $trait ) ) {
-						$pattern['trait'] = constant( $trait );
-					}
+					if ( defined( $trait ) ) $pattern['trait'] = constant( $trait );
 				}
 				if ( !isset( $pattern['build'] ) ) {
 					$build = 'create' . ucfirst( $name );
-					if ( method_exists( $deriver, $build ) ) {
-						$pattern['build'] = $build;
-					}
+					if ( method_exists( $deriver, $build ) ) $pattern['build'] = $build;
 				}
-				if ( !isset( $pattern['label'] ) ) {
-					$pattern['label'] = $name;
-				}
+				if ( !isset( $pattern['label'] ) ) $pattern['label'] = $name;
 			}
 		}
 
@@ -144,7 +138,7 @@ namespace atc\ast {
 
 		/**
 		 * Index of current pattern.
-		 * @var number
+		 * @var integer
 		 */
 		private $cursor = 0;
 

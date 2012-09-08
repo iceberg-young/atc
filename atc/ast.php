@@ -8,20 +8,8 @@ namespace atc {
 			$this->builder = $builder;
 
 			$this->location = $this->builder->readLocation();
-
+			$this->note = $this->builder->takeNote( $this->location->row );
 			$this->log = new log( $this->builder, get_class( $this ) );
-		}
-
-		public function getParent() {
-			return $this->parent;
-		}
-
-		public function getBuilder() {
-			return $this->builder;
-		}
-
-		public function getLocation() {
-			return $this->location;
 		}
 
 		public function isDeep() {
@@ -38,12 +26,23 @@ namespace atc {
 
 		public function push( $c, $s ) {
 			if ( $this->complete ) {
-				$this->log()->debug( "Pushing ($c) to a complete node." );
+				$this->log->debug( "Pushing ($c) to a complete node." );
 				return self::PUSH_OVERFLOW;
 			}
 
 			$this->fresh = $c;
 			$this->space = $s;
+			return $this->onPush();
+		}
+
+		public function complete() {
+			if ( $this->complete ) return $this->log->debug( 'Completion has already been notified.' );
+
+			$this->complete = true;
+			return $this->onComplete();
+		}
+
+		protected function onPush() {
 			if ( !$this->current ) {
 				$status = self::PUSH_CONTINUE;
 				if ( !($this->filter || $this->space) ) {
@@ -53,18 +52,18 @@ namespace atc {
 					$this->filter = true;
 				}
 				if ( $this->filter ) {
-					$this->filterDeriver();
+					$this->onFilter();
 					if ( $this->filter ) {
 						if ( $this->space ) {
 							$fragment = $this->getFragmentLog();
-							$this->log()->debug( "Child node must be identified from $fragment." );
+							$this->log->debug( "Child node must be identified from $fragment." );
 						}
 						$this->fragment .= $this->fresh;
 						$this->length += strlen( $this->fresh );
 					}
 					elseif ( $this->ending && !$this->current ) {
 						$status = self::PUSH_COMPLETE;
-						$this->done();
+						$this->complete();
 					}
 				}
 			}
@@ -72,34 +71,18 @@ namespace atc {
 			return $status;
 		}
 
-		public function done() {
-			if ( $this->complete ) {
-				return $this->log()->debug( 'Completion has already been notified.' );
-			}
+		protected function onComplete() {
 			if ( $this->filter ) {
 				$fragment = $this->getFragmentLog();
-				$this->log()->error( "Has unidentified content $fragment." );
+				$this->fragment = null;
+				return $this->log->error( "Has unidentified content $fragment." );
 			}
-			$this->complete = true;
-			if ( $this->current ) {
-				$this->current->done();
-				$this->current = null;
-			}
-			$this->fragment = null;
+
+			if ( $this->current && is_a( $this->current, __CLASS__ ) ) $this->current->complete();
 		}
 
-		public function comment( $blank ) {
-			if ( $this->current ) {
-				$comment = $this->current->comment( $blank );
-			}
-			elseif ( !$blank && $this->previous ) {
-				$comment = $this->previous->comment( $blank );
-			}
-			else {
-				$comment = new ast\part\comment( $this->builder, $this );
-				$this->comments[] = $comment;
-			}
-			return $comment;
+		protected function onFilter() {
+			$this->log->debug( __METHOD__ . ' must be overrided.' );
 		}
 
 		protected function getChildCreator( array $args ) {
@@ -131,19 +114,12 @@ namespace atc {
 			return $child;
 		}
 
-		protected function filterDeriver() {
-			$this->log()->debug( __METHOD__ . ' must be overrided.' );
-		}
-
 		protected function getDebugLocation() {
 			$debug = clone $this->location;
 			$debug->type = get_class( $this );
 			$debug->done = $this->complete;
-			return "\t#" . json_encode( $debug ) . "\n" . implode( '', $this->comments );
-		}
-
-		protected function log() {
-			return $this->log;
+			$debug->note = "{$this->note}";
+			return "\t#" . json_encode( $debug ) . "\n";
 		}
 
 		protected function getFragmentLog() {
@@ -153,12 +129,11 @@ namespace atc {
 		private function transfer() {
 			$status = $this->current->push( $this->fresh, $this->space );
 			if ( self::PUSH_CONTINUE !== $status ) {
-				$this->previous = $this->current;
 				$this->current = null;
 				if ( !$this->ending ) {
 					$status = self::PUSH_OVERFLOW === $status ? $this->push( $this->fresh, $this->space ) : self::PUSH_CONTINUE;
 				}
-				else $this->done();
+				else $this->complete();
 			}
 			return $status;
 		}
@@ -170,7 +145,7 @@ namespace atc {
 		protected $fresh;
 
 		/**
-		 * Space indicator of newly pushed literal.
+		 * Is newly pushed literal invisible?
 		 * @var boolean
 		 */
 		protected $space;
@@ -183,7 +158,7 @@ namespace atc {
 
 		/**
 		 * Length of $fragment.
-		 * @var number
+		 * @var integer
 		 */
 		protected $length = 0;
 
@@ -194,10 +169,28 @@ namespace atc {
 		protected $filter = false;
 
 		/**
-		 * Is the last node?
+		 * Is parsing the last node?
 		 * @var boolean
 		 */
 		protected $ending = false;
+
+		/**
+		 * Is parsing finished?
+		 * @var boolean
+		 */
+		private $complete = false;
+
+		/**
+		 * Superior node.
+		 * @var \atc\ast
+		 */
+		protected $parent;
+
+		/**
+		 * Current node.
+		 * @var \atc\ast
+		 */
+		protected $current;
 
 		/**
 		 * Inferior nodes.
@@ -206,52 +199,25 @@ namespace atc {
 		protected $children = array( );
 
 		/**
-		 * Indicate parsing finished.
-		 * @var boolean
-		 */
-		private $complete = false;
-
-		/**
-		 * Current node.
-		 * @var \atc\ast
-		 */
-		private $current;
-
-		/**
-		 * Previous node.
-		 * @var \atc\ast
-		 */
-		private $previous;
-
-		/**
-		 * Superior node.
-		 * @var \atc\ast
-		 */
-		private $parent;
-
-		/**
-		 * Current builder.
 		 * @var \atc\misc\builder
 		 */
-		private $builder;
+		protected $builder;
+
+		/**
+		 * @var \atc\log
+		 */
+		protected $log;
+
+		/**
+		 * @var \atc\ast\note
+		 */
+		protected $note;
 
 		/**
 		 * Location of the source beginning.
 		 * @var object
 		 */
-		private $location;
-
-		/**
-		 * Log tool.
-		 * @var type
-		 */
-		private $log;
-
-		/**
-		 * Comments.
-		 * @var array
-		 */
-		private $comments = array( );
+		protected $location;
 
 	}
 

@@ -3,22 +3,27 @@ namespace atc\ast {
 
 	class part extends \atc\ast {
 
+		const COMPLETE_STATUS = parent::PUSH_OVERFLOW;
+
 		public function __toString() {
-			return $this->content . $this->getDebugLocation();
+			return $this->current . $this->getDebugLocation();
 		}
 
-		public function done() {
-			if ( $this->content && is_a( $this->content, 'atc\ast' ) ) {
-				$this->content->done();
+		protected function onPush() {
+			if ( $this->pushCondition() ) {
+				if ( is_a( $this->current, __NAMESPACE__ ) ) {
+					$this->current->push( $this->fresh, $this->space );
+				}
+				else {
+					$this->current .= $this->fresh;
+				}
+				return parent::PUSH_CONTINUE;
 			}
-			parent::done();
+			else {
+				$this->complete();
+				return static::COMPLETE_STATUS;
+			}
 		}
-
-		/**
-		 * Parsed content.
-		 * @var mixed
-		 */
-		protected $content;
 
 	}
 

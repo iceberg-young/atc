@@ -12,50 +12,45 @@ namespace atc\ast\part {
 			return implode( ", ", $this->children );
 		}
 
-		public function push( $c, $s ) {
+		public function onPush() {
 			$status = parent::PUSH_CONTINUE;
-			if ( (',' !== $c) || $this->isDeep() ) {
-				if ( $this->content ) {
-					switch ( $this->content->push( $c, $s ) ) {
+			if ( (',' !== $this->fresh) || $this->isDeep() ) {
+				if ( $this->current ) {
+					switch ( $this->current->push( $this->fresh, $this->space ) ) {
 						case parent::PUSH_OVERFLOW:
 							$status = parent::PUSH_OVERFLOW;
-							parent::done();
+//							parent::complete();
 						case parent::PUSH_COMPLETE:
-							$this->children[] = $this->content;
-							$this->content = null;
+							$this->children[] = $this->current;
+							$this->current = null;
 							break;
 					}
 				}
-				elseif ( !$s ) {
+				elseif ( !$this->space ) {
 					if ( $this->accept ) {
 						$this->accept = false;
-						$this->getBuilder()->markLocation();
-						$this->content = call_user_func( $this->creator );
-						return $this->push( $c, $s );
+						$this->builder->markLocation();
+						$this->current = call_user_func( $this->creator );
+						return $this->push( $this->fresh, $this->space );
 					}
 					else {
 						$status = parent::PUSH_OVERFLOW;
-						parent::done();
+//						parent::complete();
 					}
 				}
 			}
 			else {
 				$this->accept = true;
-				$this->appendLast();
+				$this->onComplete();
 			}
 			return $status;
 		}
 
-		public function done() {
-			$this->appendLast();
-			parent::done();
-		}
-
-		private function appendLast() {
-			if ( $this->content ) {
-				$this->content->done();
-				$this->children[] = $this->content;
-				$this->content = null;
+		protected function onComplete() {
+			if ( $this->current ) {
+				$this->current->complete();
+				$this->children[] = $this->current;
+				$this->current = null;
 			}
 		}
 

@@ -9,7 +9,7 @@ namespace atc\ast {
 			return implode( "\n", $this->children );
 		}
 
-		protected function filterDeriver() {
+		protected function onFilter() {
 			if ( $this->length ) {
 				$more = preg_match( '/\w/', $this->fresh );
 				foreach ( $this->options as $option => $length ) {
@@ -25,7 +25,7 @@ namespace atc\ast {
 				if ( !isset( $type ) ) {
 					if ( !static::FALLBACK ) {
 						$fragment = $this->getFragmentLog();
-						$this->log()->error( "$fragment isn't an option of child node." );
+						$this->log->error( "$fragment isn't an option of child node." );
 						die();
 					}
 					$type = static::FALLBACK;
@@ -35,9 +35,7 @@ namespace atc\ast {
 				$this->options = null;
 				$this->children[] = $this->appendChild( $type );
 			}
-			else {
-				$this->options = static::$prefixes;
-			}
+			else $this->options = static::$prefixes;
 		}
 
 		/**

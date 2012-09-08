@@ -6,6 +6,7 @@ namespace atc {
 		public function __construct( $path ) {
 			$this->log = new log( $this, __CLASS__ );
 
+			$this->markLocation();
 			switch ( strrchr( $path, '.' ) ) {
 				case '.ate':
 					$this->node = new ast\body\_call( $this );
@@ -78,6 +79,14 @@ namespace atc {
 			return (object) $this->location;
 		}
 
+		public function takeNote( $row ) {
+			$note = $this->note;
+			if ( $note && $note->adjacent( $row ) ) {
+				$this->note = null;
+				return $note;
+			}
+		}
+
 		private function setParser( $parser ) {
 			switch ( $parser ) {
 				case self::PARSE_BRACKET:
@@ -90,12 +99,12 @@ namespace atc {
 					$this->pusher = array( $this->node, 'push' );
 					break;
 
-				case self::PARSE_COMMENT:
-					if ( !($this->comment && $this->blank && $this->comment->more( $this->row )) ) {
+				case self::PARSE_NOTE:
+					if ( !($this->note && $this->blank && $this->note->adjacent( $this->row, true )) ) {
 						$this->markLocation();
-						$this->comment = $this->node->comment( $this->blank );
+						$this->note = new ast\note( $this );
 					}
-					$this->pusher = array( $this->comment, 'push' );
+					$this->pusher = array( $this->note, 'push' );
 					$parser = self::PARSE_TERMINAL;
 					break;
 
@@ -144,7 +153,7 @@ namespace atc {
 			else $this->parseTerminal( $c );
 		}
 
-		const PARSE_COMMENT = 'parseComment';
+		const PARSE_NOTE = 'parseNote';
 		const PARSE_TERMINAL = 'parseTerminal';
 
 		private function parseTerminal( $c ) {
@@ -191,13 +200,13 @@ namespace atc {
 
 		/**
 		 * Cyrrent row number.
-		 * @var number
+		 * @var integer
 		 */
 		private $row;
 
 		/**
 		 * Current column number
-		 * @var number
+		 * @var integer
 		 */
 		private $column;
 
@@ -226,10 +235,9 @@ namespace atc {
 		private $delimiters;
 
 		/**
-		 * Comment.
-		 * @var part\comment
+		 * @var ast\note
 		 */
-		private $comment;
+		private $note;
 
 		/**
 		 * Is an invisible character?
@@ -265,7 +273,7 @@ namespace atc {
 			'`' => self::PARSE_RAW_STRING,
 			'"' => self::PARSE_ESCAPABLE,
 			"'" => self::PARSE_ESCAPABLE,
-			'#' => self::PARSE_COMMENT,
+			'#' => self::PARSE_NOTE,
 		);
 
 		const LAST_SPACE = 32; // ord( ' ' )
