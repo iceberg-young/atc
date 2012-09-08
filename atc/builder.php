@@ -52,6 +52,8 @@ namespace atc {
 				$this->blank = $this->blank && $this->space;
 			}
 			fclose( $file );
+
+			$this->node->complete();
 		}
 
 		public function getNode() {

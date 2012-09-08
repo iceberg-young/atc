@@ -1,7 +1,7 @@
 <?php
-namespace atc\ast\part {
+namespace atc\ast\util {
 
-	class series extends \atc\ast\part {
+	class series extends \atc\ast {
 
 		public function __construct( \atc\builder $builder, $parent = null ) {
 			parent::__construct( $builder, $parent );
@@ -19,7 +19,6 @@ namespace atc\ast\part {
 					switch ( $this->current->push( $this->fresh, $this->space ) ) {
 						case parent::PUSH_OVERFLOW:
 							$status = parent::PUSH_OVERFLOW;
-//							parent::complete();
 						case parent::PUSH_COMPLETE:
 							$this->children[] = $this->current;
 							$this->current = null;
@@ -31,12 +30,9 @@ namespace atc\ast\part {
 						$this->accept = false;
 						$this->builder->markLocation();
 						$this->current = call_user_func( $this->creator );
-						return $this->push( $this->fresh, $this->space );
+						return $this->onPush();
 					}
-					else {
-						$status = parent::PUSH_OVERFLOW;
-//						parent::complete();
-					}
+					else $status = parent::PUSH_OVERFLOW;
 				}
 			}
 			else {

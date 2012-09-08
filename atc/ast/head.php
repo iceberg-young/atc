@@ -19,7 +19,7 @@ namespace atc\ast {
 			}
 		}
 
-		protected function onFilter() {
+		protected function onIdentify() {
 			$begin = $this->cursor;
 			$deriver = get_called_class();
 			while ( isset( static::$patterns[$this->cursor] ) ) {
@@ -39,21 +39,20 @@ namespace atc\ast {
 					elseif ( $this->length === $length ) {
 						$match = preg_match( '/\W/', $this->fresh ) && ($pattern['trait'] === $this->fragment);
 					}
-					else return;
+					else return parent::PUSH_CONTINUE;
 				}
 				else $match = true;
 
-				if ( !isset( static::$patterns[++$this->cursor] ) ) $this->ending = true;
+				$this->cursor++;
 
 				if ( $match ) {
-					$this->filter = false;
 					if ( isset( $pattern['build'] ) ) {
 						$this->children[$pattern['label']] = $this->{$pattern['build']}();
 					}
 					elseif ( isset( $pattern['label'] ) ) {
 						$this->children[$pattern['label']] = $this->fresh;
 					}
-					return;
+					return parent::PUSH_COMPLETE;
 				}
 				elseif ( !isset( $pattern['optional'] ) ) {
 					$fragment = $this->getFragmentLog();
@@ -61,8 +60,7 @@ namespace atc\ast {
 					die( $this->log->error( "Unexpected $fragment. Expecting: $expectations." ) );
 				}
 			}
-			$fragment = $this->getFragmentLog();
-			die( $this->log->error( "Out of pattern to identify $fragment." ) );
+			return parent::PUSH_OVERFLOW;
 		}
 
 		protected function completePattern( $deriver, &$pattern ) {
@@ -113,7 +111,7 @@ namespace atc\ast {
 		const TEMPLATE_TRAIT = '{';
 
 		protected function createTemplate() {
-			return $this->appendChild( 'part\block', 'part\series', 'head\_as\_template' );
+			return $this->appendChild( 'part\block', 'util\series', 'head\_as\_template' );
 		}
 
 		const ACCESS_TRAIT = '#[+-]#';

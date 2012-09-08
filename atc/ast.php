@@ -32,7 +32,9 @@ namespace atc {
 
 			$this->fresh = $c;
 			$this->space = $s;
-			return $this->onPush();
+			$status = $this->onPush();
+			if ( self::PUSH_CONTINUE !== $status ) $this->complete();
+			return $status;
 		}
 
 		public function complete() {
@@ -43,17 +45,21 @@ namespace atc {
 		}
 
 		protected function onPush() {
-			if ( !$this->current ) {
-				$status = self::PUSH_CONTINUE;
-				if ( !($this->filter || $this->space) ) {
-					$this->builder->markLocation();
-					$this->fragment = '';
-					$this->length = 0;
-					$this->filter = true;
+			if ( $this->current ) $status = $this->transfer();
+			else {
+				if ( !$this->identify ) {
+					if ( $this->space ) $status = self::PUSH_CONTINUE;
+					else {
+						$this->builder->markLocation();
+						$this->fragment = '';
+						$this->length = 0;
+						$this->identify = true;
+					}
 				}
-				if ( $this->filter ) {
-					$this->onFilter();
-					if ( $this->filter ) {
+				if ( $this->identify ) {
+					$status = $this->onIdentify();
+					$this->identify = self::PUSH_CONTINUE === $status;
+					if ( $this->identify ) {
 						if ( $this->space ) {
 							$fragment = $this->getFragmentLog();
 							$this->log->debug( "Child node must be identified from $fragment." );
@@ -61,18 +67,14 @@ namespace atc {
 						$this->fragment .= $this->fresh;
 						$this->length += strlen( $this->fresh );
 					}
-					elseif ( $this->ending && !$this->current ) {
-						$status = self::PUSH_COMPLETE;
-						$this->complete();
-					}
+					elseif ( self::PUSH_COMPLETE === $status ) $status = self::PUSH_CONTINUE;
 				}
 			}
-			else $status = $this->transfer();
 			return $status;
 		}
 
 		protected function onComplete() {
-			if ( $this->filter ) {
+			if ( $this->identify ) {
 				$fragment = $this->getFragmentLog();
 				$this->fragment = null;
 				return $this->log->error( "Has unidentified content $fragment." );
@@ -81,7 +83,7 @@ namespace atc {
 			if ( $this->current && is_a( $this->current, __CLASS__ ) ) $this->current->complete();
 		}
 
-		protected function onFilter() {
+		protected function onIdentify() {
 			$this->log->debug( __METHOD__ . ' must be overrided.' );
 		}
 
@@ -130,10 +132,11 @@ namespace atc {
 			$status = $this->current->push( $this->fresh, $this->space );
 			if ( self::PUSH_CONTINUE !== $status ) {
 				$this->current = null;
-				if ( !$this->ending ) {
-					$status = self::PUSH_OVERFLOW === $status ? $this->push( $this->fresh, $this->space ) : self::PUSH_CONTINUE;
+				if ( self::PUSH_OVERFLOW === $status ) {
+					if ( $this->identify ) die( $this->log->debug( 'Identified 2 nodes of the same level at the same time.' ) );
+					$status = $this->onPush();
 				}
-				else $this->complete();
+				else $status = self::PUSH_CONTINUE;
 			}
 			return $status;
 		}
@@ -151,7 +154,7 @@ namespace atc {
 		protected $space;
 
 		/**
-		 * Pushed part during deriver filtering.
+		 * Pushed part during deriver identifying.
 		 * @var string
 		 */
 		protected $fragment = '';
@@ -161,24 +164,6 @@ namespace atc {
 		 * @var integer
 		 */
 		protected $length = 0;
-
-		/**
-		 * Is identifying node?
-		 * @var boolean
-		 */
-		protected $filter = false;
-
-		/**
-		 * Is parsing the last node?
-		 * @var boolean
-		 */
-		protected $ending = false;
-
-		/**
-		 * Is parsing finished?
-		 * @var boolean
-		 */
-		private $complete = false;
 
 		/**
 		 * Superior node.
@@ -218,6 +203,18 @@ namespace atc {
 		 * @var object
 		 */
 		protected $location;
+
+		/**
+		 * Is identifying node?
+		 * @var boolean
+		 */
+		private $identify = false;
+
+		/**
+		 * Is parsing finished?
+		 * @var boolean
+		 */
+		private $complete = false;
 
 	}
 

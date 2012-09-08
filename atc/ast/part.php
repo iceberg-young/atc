@@ -14,15 +14,10 @@ namespace atc\ast {
 				if ( is_a( $this->current, __NAMESPACE__ ) ) {
 					$this->current->push( $this->fresh, $this->space );
 				}
-				else {
-					$this->current .= $this->fresh;
-				}
+				else $this->current .= $this->fresh;
 				return parent::PUSH_CONTINUE;
 			}
-			else {
-				$this->complete();
-				return static::COMPLETE_STATUS;
-			}
+			else return static::COMPLETE_STATUS;
 		}
 
 	}
