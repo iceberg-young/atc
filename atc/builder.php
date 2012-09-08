@@ -21,8 +21,8 @@ namespace atc {
 
 		public function parse() {
 			// Source location.
-			$this->row = 0;
-			$this->column = -1;
+			$this->row = 1;
+			$this->column = 0;
 
 			// Bracket level.
 			$this->stack = array( );
@@ -38,7 +38,7 @@ namespace atc {
 			while ( false !== ($c = fgetc( $file )) ) {
 				if ( "\n" === $c ) {
 					++$this->row;
-					$this->column = -1;
+					$this->column = 0;
 					$this->blank = true;
 				}
 				else ++$this->column;
@@ -74,8 +74,8 @@ namespace atc {
 			$this->location = $this->getLocation();
 		}
 
-		public function pickLocation() {
-			return $this->location;
+		public function readLocation() {
+			return (object) $this->location;
 		}
 
 		private function setParser( $parser ) {
@@ -203,7 +203,7 @@ namespace atc {
 
 		/**
 		 * Source location snapshot.
-		 * @var object
+		 * @var array
 		 */
 		private $location;
 

@@ -7,8 +7,7 @@ namespace atc {
 			$this->parent = $parent;
 			$this->builder = $builder;
 
-			$this->location = (object) $this->builder->pickLocation();
-			$this->location->type = get_class( $this );
+			$this->location = $this->builder->readLocation();
 
 			$this->log = new log( $this->builder, get_class( $this ) );
 		}
@@ -38,7 +37,7 @@ namespace atc {
 		const PUSH_OVERFLOW = 'overflow';
 
 		public function push( $c, $s ) {
-			if ( isset( $this->location->done ) ) {
+			if ( $this->complete ) {
 				$this->log()->debug( "Pushing ($c) to a complete node." );
 				return self::PUSH_OVERFLOW;
 			}
@@ -74,14 +73,14 @@ namespace atc {
 		}
 
 		public function done() {
-			if ( isset( $this->location->done ) ) {
+			if ( $this->complete ) {
 				return $this->log()->debug( 'Completion has already been notified.' );
 			}
 			if ( $this->filter ) {
 				$fragment = $this->getFragmentLog();
 				$this->log()->error( "Has unidentified content $fragment." );
 			}
-			$this->location->done = true;
+			$this->complete = true;
 			if ( $this->current ) {
 				$this->current->done();
 				$this->current = null;
@@ -137,7 +136,10 @@ namespace atc {
 		}
 
 		protected function getDebugLocation() {
-			return "\t#" . json_encode( $this->location ) . "\n";
+			$debug = clone $this->location;
+			$debug->type = get_class( $this );
+			$debug->done = $this->complete;
+			return "\t#" . json_encode( $debug ) . "\n" . implode( '', $this->comments );
 		}
 
 		protected function log() {
@@ -202,6 +204,12 @@ namespace atc {
 		 * @var array
 		 */
 		protected $children = array( );
+
+		/**
+		 * Indicate parsing finished.
+		 * @var boolean
+		 */
+		private $complete = false;
 
 		/**
 		 * Current node.

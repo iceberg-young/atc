@@ -29,6 +29,7 @@ namespace atc\ast\part {
 				elseif ( !$s ) {
 					if ( $this->accept ) {
 						$this->accept = false;
+						$this->getBuilder()->markLocation();
 						$this->content = call_user_func( $this->creator );
 						return $this->push( $c, $s );
 					}
