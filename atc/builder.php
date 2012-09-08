@@ -85,6 +85,7 @@ namespace atc {
 			$note = $this->note;
 			if ( $note && $note->adjacent( $row ) ) {
 				$this->note = null;
+				$note->complete();
 				return $note;
 			}
 		}

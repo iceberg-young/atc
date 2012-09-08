@@ -162,6 +162,8 @@ Build-in Method
 
   - `_create`
   - `_delete`
+  - `_copy`
+  - `_move`
 
 
 ### Iteration
@@ -183,9 +185,9 @@ Operators
   - `.` member
   - `:` assign
   - `,` list separator
-  - `#` comment
+  - `#` note
+  - `@` special mark in note
   - `\` escaping in literals
-  - `$` embedding in literals
 
 
 ### Comparison
@@ -238,8 +240,7 @@ Operators
 
     - `.` static, also for unit and local variable
     - `*` virtual, also for base
-    - `/` final, also for class
-    - `=` override
+    - `=` override, not optional as in C++
 
   Access prefix must before locate prefix.
 
@@ -251,8 +252,15 @@ Operators
 
 ### Not Used
 
-  - `@`
   - `?`
+  - `$`
+
+
+Marks in Note
+-------------
+
+  - `@final`
+  - `@peace` noexcept in C++
 
 
 [nm]: http://en.wikipedia.org/wiki/Name_mangling#Name_mangling_in_C.2B.2B
