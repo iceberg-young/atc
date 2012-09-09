@@ -6,7 +6,7 @@ namespace atc\ast\part {
 		const DERIVER_PUSH = parent::DERIVER_PUSH_PEND;
 
 		public function pushCondition() {
-			return (';' !== $this->fresh) || $this->isDeep();
+			return (\atc\ast\head::END_TRAIT !== $this->fresh) || $this->isDeep();
 		}
 
 	}

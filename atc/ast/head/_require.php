@@ -16,7 +16,7 @@ namespace atc\ast\head {
 				'template' => 'path',
 			),
 			array(
-				'trait' => ';',
+				'trait' => parent::END_TRAIT,
 			),
 		);
 

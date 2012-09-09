@@ -118,6 +118,7 @@ namespace atc\ast {
 		const LOCATE_TRAIT = '#[.*=]#';
 		const STATIC_TRAIT = '.';
 		const VIRTUAL_TRAIT = '*';
+		const END_TRAIT = ';';
 
 		private static function getExpectations( $begin, $end ) {
 			do {

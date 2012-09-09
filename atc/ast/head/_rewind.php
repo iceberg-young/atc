@@ -17,7 +17,7 @@ namespace atc\ast\head {
 				'optional' => true,
 			),
 			array(
-				'trait' => ';',
+				'trait' => parent::END_TRAIT,
 			),
 		);
 

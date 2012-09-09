@@ -22,7 +22,7 @@ namespace atc\ast\head {
 				'template' => 'link',
 			),
 			array(
-				'trait' => ';',
+				'trait' => parent::END_TRAIT,
 			),
 		);
 

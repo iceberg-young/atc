@@ -9,7 +9,7 @@ namespace atc\ast\part {
 		}
 
 		public function pushCondition() {
-			return \atc\ast\head::BODY_TRAIT !== $this->fresh;
+			return (\atc\ast\head::BODY_TRAIT !== $this->fresh) || ($this->builder->getLevel() > $this->location->level + 1);
 		}
 
 	}

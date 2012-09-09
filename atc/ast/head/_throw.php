@@ -20,7 +20,7 @@ namespace atc\ast\head {
 				'template' => 'oops',
 			),
 			array(
-				'trait' => ';',
+				'trait' => parent::END_TRAIT,
 			),
 		);
 
