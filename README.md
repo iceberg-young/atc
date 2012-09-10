@@ -69,7 +69,8 @@ There are 3 type of literals.
   - Single quoted ('), for character.
   - Double quoted ("), for string.
   - Back quoted (`), for no escaping string. E.g.
-    `delimiter`\nothing "is" `changed``delimiter` => \nothing "is" `changed`
+
+    <pre>`delimiter`\nothing "is" `changed``delimiter` -> \nothing "is" `changed`</pre>
 
 Literals may have suffix (to be determined).
 
@@ -186,7 +187,7 @@ Operators
   - `:` assign
   - `,` list separator
   - `#` note
-  - `@` special mark in note
+  - `@` placement new
   - `\` escaping in literals
 
 
@@ -231,12 +232,12 @@ Operators
 
 ### Prefix
 
-  1. Access prefix. For scope, class, base, call, unit.
+  - Access prefix. For scope, class, base, call, unit.
 
     - `+` protected
     - `-` private
 
-  2. Locate prefix. For member call.
+  - Locate prefix. For member call.
 
     - `.` static, also for unit and local variable
     - `*` virtual, also for base
@@ -244,7 +245,7 @@ Operators
 
   Access prefix must before locate prefix.
 
-  3. Function parameter prefix.
+  - Function parameter prefix.
 
     - `+` in & out
     - `-` out
@@ -259,6 +260,7 @@ Operators
 Marks in Note
 -------------
 
+  - `@accept` suppress compiler notice, e.g. # @accept final
   - `@final`
   - `@peace` noexcept in C++
 
