@@ -103,11 +103,14 @@ namespace atc {
 					break;
 
 				case self::PARSE_NOTE:
-					if ( !($this->note && $this->blank && $this->note->adjacent( $this->row, true )) ) {
-						$this->markLocation();
-						$this->note = new ast\note( $this );
+					if ( $this->blank ) {
+						if ( !($this->note && $this->note->adjacent( $this->row, true )) ) {
+							$this->markLocation();
+							$this->note = new ast\note( $this );
+						}
+						$this->pusher = array( $this->note, 'push' );
 					}
-					$this->pusher = array( $this->note, 'push' );
+					else $this->pusher = array( new ast\note( $this ), 'push' );
 					$parser = self::PARSE_TERMINAL;
 					break;
 
