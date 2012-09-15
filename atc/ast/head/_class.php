@@ -22,7 +22,6 @@ namespace atc\ast\head {
 			),
 			array(
 				'template' => 'name',
-				'optional' => true,
 			),
 			array(
 				'template' => 'template',

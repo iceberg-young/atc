@@ -7,11 +7,6 @@ namespace atc\ast {
 			return $this->current . $this->getDebugLocation();
 		}
 
-		public function onPush() {
-			$this->prefix ? $this->prefix = false : $this->current .= $this->fresh;
-			return parent::PUSH_CONTINUE;
-		}
-
 		public function adjacent( $row, $more = false ) {
 			$adjacent = $this->location->row + $this->lines >= $row;
 			if ( $adjacent && $more ) {
@@ -20,6 +15,11 @@ namespace atc\ast {
 				++$this->lines;
 			}
 			return $adjacent;
+		}
+
+		protected function onPush() {
+			$this->prefix ? $this->prefix = false : $this->current .= $this->fresh;
+			return parent::PUSH_CONTINUE;
 		}
 
 		/**

@@ -12,7 +12,7 @@ namespace atc\ast\util {
 			return implode( ", ", $this->children );
 		}
 
-		public function onPush() {
+		protected function onPush() {
 			$status = parent::PUSH_CONTINUE;
 			if ( (',' !== $this->fresh) || $this->isDeep() ) {
 				if ( $this->current ) {

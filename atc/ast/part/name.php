@@ -8,7 +8,7 @@ namespace atc\ast\part {
 			$this->rule = $global ? '#[\[\w\.\]]#' : '#\w#';
 		}
 
-		public function pushCondition() {
+		protected function pushCondition() {
 			return preg_match( $this->rule, $this->fresh );
 		}
 

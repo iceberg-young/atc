@@ -1,7 +1,7 @@
 <?php
 namespace atc\ast {
 
-	class part extends \atc\ast {
+	abstract class part extends \atc\ast {
 
 		const COMPLETE_STATUS = parent::PUSH_OVERFLOW;
 

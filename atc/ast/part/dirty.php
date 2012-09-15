@@ -5,7 +5,7 @@ namespace atc\ast\part {
 
 		const DERIVER_PUSH = parent::DERIVER_PUSH_PEND;
 
-		public function pushCondition() {
+		protected function pushCondition() {
 			return (\atc\ast\head::END_TRAIT !== $this->fresh) || $this->isDeep();
 		}
 

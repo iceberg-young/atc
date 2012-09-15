@@ -12,14 +12,6 @@ namespace atc {
 			$this->log = new log( $this->builder, get_class( $this ) );
 		}
 
-		public function isDeep() {
-			return $this->builder->getLevel() > $this->location->level;
-		}
-
-		public function isShallow() {
-			return $this->builder->getLevel() < $this->location->level;
-		}
-
 		const PUSH_CONTINUE = 'continue';
 		const PUSH_COMPLETE = 'complete';
 		const PUSH_OVERFLOW = 'overflow';
@@ -87,13 +79,12 @@ namespace atc {
 			$this->log->debug( __METHOD__ . ' must be overrided.' );
 		}
 
-		protected function getChildCreator( array $args ) {
-			$type = array_shift( $args );
-			array_unshift( $args, $this->builder, $this );
-			$class = new \ReflectionClass( "atc\\ast\\$type" );
-			return function() use($class, $args) {
-				return $class->newInstanceArgs( $args );
-			};
+		protected function isDeep() {
+			return $this->builder->getLevel() > $this->location->level;
+		}
+
+		protected function isShallow() {
+			return $this->builder->getLevel() < $this->location->level;
 		}
 
 		const DERIVER_PUSH_PEND = 'pend';
@@ -114,6 +105,15 @@ namespace atc {
 					break;
 			}
 			return $child;
+		}
+
+		protected function getChildCreator( array $args ) {
+			$type = array_shift( $args );
+			array_unshift( $args, $this->builder, $this );
+			$class = new \ReflectionClass( "atc\\ast\\$type" );
+			return function() use($class, $args) {
+				return $class->newInstanceArgs( $args );
+			};
 		}
 
 		protected function getDebugLocation() {

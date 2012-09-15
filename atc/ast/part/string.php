@@ -7,7 +7,7 @@ namespace atc\ast\part {
 			return '"' . addslashes( $this->children['content'] ) . '"' . $this->current . $this->getDebugLocation();
 		}
 
-		public function onPush() {
+		protected function onPush() {
 			return $this->{$this->parser}();
 		}
 

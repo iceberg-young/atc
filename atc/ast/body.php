@@ -1,7 +1,7 @@
 <?php
 namespace atc\ast {
 
-	class body extends \atc\ast {
+	abstract class body extends \atc\ast {
 
 		const FALLBACK = null; ///< For mismatched case.
 

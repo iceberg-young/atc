@@ -1,13 +1,13 @@
 <?php
 namespace atc\ast {
 
-	class head extends \atc\ast {
+	abstract class head extends \atc\ast {
 
 		public function __get( $name ) {
 			return @$this->children[$name];
 		}
 
-		public function onComplete() {
+		protected function onComplete() {
 			parent::onComplete();
 			$cursor = $this->cursor;
 			while ( isset( static::$patterns[$cursor] ) ) {
@@ -63,21 +63,6 @@ namespace atc\ast {
 			return parent::PUSH_OVERFLOW;
 		}
 
-		protected function completePattern( $deriver, &$pattern ) {
-			if ( isset( $pattern['template'] ) ) {
-				$name = $pattern['template'];
-				if ( !isset( $pattern['trait'] ) ) {
-					$trait = $deriver . '::' . strtoupper( $name ) . '_TRAIT';
-					if ( defined( $trait ) ) $pattern['trait'] = constant( $trait );
-				}
-				if ( !isset( $pattern['build'] ) ) {
-					$build = 'create' . ucfirst( $name );
-					if ( method_exists( $deriver, $build ) ) $pattern['build'] = $build;
-				}
-				if ( !isset( $pattern['label'] ) ) $pattern['label'] = $name;
-			}
-		}
-
 		protected function createPath() {
 			return $this->appendChild( 'part\string' );
 		}
@@ -119,6 +104,21 @@ namespace atc\ast {
 		const STATIC_TRAIT = '.';
 		const VIRTUAL_TRAIT = '*';
 		const END_TRAIT = ';';
+
+		private function completePattern( $deriver, &$pattern ) {
+			if ( isset( $pattern['template'] ) ) {
+				$name = $pattern['template'];
+				if ( !isset( $pattern['trait'] ) ) {
+					$trait = $deriver . '::' . strtoupper( $name ) . '_TRAIT';
+					if ( defined( $trait ) ) $pattern['trait'] = constant( $trait );
+				}
+				if ( !isset( $pattern['build'] ) ) {
+					$build = 'create' . ucfirst( $name );
+					if ( method_exists( $deriver, $build ) ) $pattern['build'] = $build;
+				}
+				if ( !isset( $pattern['label'] ) ) $pattern['label'] = $name;
+			}
+		}
 
 		private static function getExpectations( $begin, $end ) {
 			do {

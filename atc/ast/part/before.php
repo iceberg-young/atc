@@ -8,7 +8,7 @@ namespace atc\ast\part {
 			$this->current = call_user_func( $this->getChildCreator( array_slice( func_get_args(), 2 ) ) );
 		}
 
-		public function pushCondition() {
+		protected function pushCondition() {
 			return (\atc\ast\head::BODY_TRAIT !== $this->fresh) || ($this->builder->getLevel() > $this->location->level + 1);
 		}
 

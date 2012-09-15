@@ -11,7 +11,7 @@ namespace atc\ast\part {
 			$this->current = call_user_func( $this->getChildCreator( array_slice( func_get_args(), 2 ) ) );
 		}
 
-		public function pushCondition() {
+		protected function pushCondition() {
 			return !$this->isShallow();
 		}
 
