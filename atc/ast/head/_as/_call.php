@@ -1,10 +1,10 @@
 <?php
 namespace atc\ast\head\_as {
 
-	class _function extends \atc\ast\head\_as {
+	class _call extends \atc\ast\head\_as {
 
 		public function __toString() {
-			return "{$this->access}{$this->name} AS {$this->link}({$this->init})" . $this->getDebugLocation();
+			return "{$this->access}{$this->name} AS {$this->link}({$this->call_arguments})" . $this->getDebugLocation();
 		}
 
 		/**
@@ -26,7 +26,7 @@ namespace atc\ast\head\_as {
 				'template' => 'link',
 			),
 			array(
-				'template' => 'init',
+				'template' => 'call_arguments',
 				'optional' => true,
 			),
 		);

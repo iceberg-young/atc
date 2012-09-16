@@ -7,12 +7,6 @@ namespace atc\ast\head {
 			return "{$this->name} AS {$this->link}" . $this->getDebugLocation();
 		}
 
-		const INIT_TRAIT = '(';
-
-		protected function createInit() {
-			return $this->appendChild( 'part\block', 'part\dirty' );
-		}
-
 		/**
 		 * Override parent's.
 		 * @var array

@@ -93,10 +93,28 @@ namespace atc\ast {
 			return $this->appendChild( 'head\_as' );
 		}
 
-		const TEMPLATE_TRAIT = '{';
+		const TYPE_PARAMETERS_TRAIT = '{';
 
-		protected function createTemplate() {
-			return $this->appendChild( 'part\block', 'util\series', 'head\_as\_template' );
+		protected function createTypeParameters() {
+			return $this->appendChild( 'part\block', 'util\series', 'head\_as\_type' );
+		}
+
+		const TYPE_ARGUMENTS_TRAIT = '{';
+
+		protected function createTypeArguments() {
+			return $this->appendChild( 'part\block', 'util\series', 'part\dirty' );
+		}
+
+		const CALL_PARAMETERS_TRAIT = '(';
+
+		protected function createCallParameters() {
+			return $this->appendChild( 'part\block', 'util\series', 'head\_as\_call' );
+		}
+
+		const CALL_ARGUMENTS_TRAIT = '(';
+
+		protected function createCallArguments() {
+			return $this->appendChild( 'part\block', 'util\series', 'part\dirty' );
 		}
 
 		const ACCESS_TRAIT = '#[+-]#';
@@ -113,7 +131,7 @@ namespace atc\ast {
 					if ( defined( $trait ) ) $pattern['trait'] = constant( $trait );
 				}
 				if ( !isset( $pattern['build'] ) ) {
-					$build = 'create' . ucfirst( $name );
+					$build = 'create' . str_replace( ' ', '', ucwords( str_replace( '_', ' ', $name ) ) );
 					if ( method_exists( $deriver, $build ) ) $pattern['build'] = $build;
 				}
 				if ( !isset( $pattern['label'] ) ) $pattern['label'] = $name;
