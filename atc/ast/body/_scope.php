@@ -9,7 +9,6 @@ namespace atc\ast\body {
 		 */
 		protected static $prefixes = array(
 			'scope' => 5,
-			'alias' => 5,
 			'class' => 5,
 			'call' => 4,
 		);

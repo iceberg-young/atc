@@ -4,7 +4,7 @@ namespace atc\ast\head\_as {
 	class _call extends \atc\ast\head\_as {
 
 		public function __toString() {
-			return "{$this->access}{$this->name} AS {$this->link}({$this->call_arguments})" . $this->getDebugLocation();
+			return "{$this->pass}{$this->name} AS {$this->link}({$this->call_arguments})" . $this->getDebugLocation();
 		}
 
 		/**
@@ -13,7 +13,7 @@ namespace atc\ast\head\_as {
 		 */
 		protected static $patterns = array(
 			array(
-				'template' => 'access',
+				'template' => 'pass',
 				'optional' => true,
 			),
 			array(

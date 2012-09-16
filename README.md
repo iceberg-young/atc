@@ -10,26 +10,13 @@ Weird Ideas
   - Prefer unique meaning of each operator.
     E.g. in C++
 
-    - `&` can get address, or bit and;
-    - `*` can multiply, or dereference.
+    - `&` can be getting address, or bit and;
+    - `*` can be multiplication, or dereference.
 
     *AT* tries to avoid this.
 
   - Reduce the need of [name mangling][nm].
-
-    - Overloading.
-      Programmer should be able to specify distinct name to each overloading.
-      I.e. write distinct functions first, then put them into an alias group.
-
-      ```
-      alias glColor : {glColor3ub, glColor4f}; # Refer OpenGL functions
-      ```
-
-    - Template specialization.
-
-      ```
-      alias template_class{specialized_arguments} : specialized_class;
-      ```
+    Use @export mark to give an unique name.
 
   - Prefer less key press, especially less combination key press.
 
@@ -88,9 +75,8 @@ Key Words
 
 ### Declaration
 
-  - `alias`
   - `base`
-  - `new`
+  - `new` auto in C++
 
 
 ### Jump
@@ -189,6 +175,7 @@ Operators
   - `#` note
   - `@` placement new
   - `\` escaping in literals
+  - `$` reference, & in C++
 
 
 ### Comparison
@@ -232,29 +219,38 @@ Operators
 
 ### Prefix
 
+Each instance can only has 1 option from each category.
+
   - Access prefix. For scope, class, base, call, unit.
 
+    - `(empty)` public
     - `+` protected
     - `-` private
 
-  - Locate prefix. For member call.
+  - Locate prefix. For member call, unit.
 
-    - `.` static, also for unit and local variable
+    - `.` static, also for local variable
     - `*` virtual, also for base
     - `=` override, not optional as in C++
 
-  Access prefix must before locate prefix.
+  - Reference prefix. For unit, local variable.
 
-  - Function parameter prefix.
+    - `$` reference
 
-    - `+` in & out
-    - `-` out
+  Must be sorted in (access, locate, reference) order.
+
+  - Call parameter prefix.
+
+    - `(empty)` in, constant reference
+    - `$` in & out, reference
+    - `-` out, move
+
+    Call parameters must be sorted in (in, in&out, out) order.
 
 
 ### Not Used
 
   - `?`
-  - `$`
 
 
 Marks in Note
@@ -263,6 +259,11 @@ Marks in Note
   - `@accept` suppress compiler notice, e.g. # @accept final
   - `@final`
   - `@peace` noexcept in C++
+  - `@align`
+  - `@export` can give several names, unavailable for unspecialized template
+  - `@rank` class member order for memory layout
+  - `@invariant` constexpr in C++
+  - `@reflection` generate reflection data
 
 
 [nm]: http://en.wikipedia.org/wiki/Name_mangling#Name_mangling_in_C.2B.2B

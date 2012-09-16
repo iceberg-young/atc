@@ -119,8 +119,10 @@ namespace atc\ast {
 
 		const ACCESS_TRAIT = '#[+-]#';
 		const LOCATE_TRAIT = '#[.*=]#';
+		const PASS_TRAIT = '#[$-]#';
 		const STATIC_TRAIT = '.';
 		const VIRTUAL_TRAIT = '*';
+		const REF_TRAIT = '$';
 		const END_TRAIT = ';';
 
 		private function completePattern( $deriver, &$pattern ) {

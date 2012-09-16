@@ -8,7 +8,6 @@ namespace atc\ast\body {
 		 * @var array
 		 */
 		protected static $prefixes = array(
-			'alias' => 5,
 			'base' => 4,
 			'call' => 4,
 			'unit' => 4,
